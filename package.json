@@ -1,0 +1,34 @@
+{
+  "name": "thing-server",
+  "version": "1.0.0",
+  "description": "A simple REST API server for returning JSON things",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "mocha test/unit --recursive --timeout 20000",
+    "test:server": "mocha test/server --recursive --timeout 20000",
+    "test-coverage": "./node_modules/.bin/istanbul cover _mocha -- -R spec test/**/*",
+    "docker:build": "docker build -t mitchallen/thing-server .",
+    "docker:run": "docker run -d -p 1234:3000 --name thing-server mitchallen/thing-server",
+    "docker:start": "docker start thing-server",
+    "docker:stop": "docker stop thing-server",
+    "docker:rm": "docker rm thing-server"
+  },
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mitchallen/thing-server.git"
+  },
+  "author": "Mitch Allen <npm@mitchallen.com> (http://mitchallen.com)",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "istanbul": "^0.4.5",
+    "mocha": "^5.2.0",
+    "should": "^13.2.3",
+    "supertest": "^3.3.0"
+  }
+}
