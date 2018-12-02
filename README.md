@@ -40,5 +40,11 @@ Assumes container is running and set to port 1234.
 
 ### Remove
 
+#### Remove Container
+
     docker stop thing-server
     docker rm thing-server
+
+### Remove Image
+
+    docker rmi mitchallen/thing-server
