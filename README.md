@@ -10,7 +10,7 @@ A simple REST API server for returning JSON things.
 
 ### Run the image locally
 
-This example runs the servera locally on port 1234.
+This example runs the server locally on port 1234.
 
     docker run -d -p 1234:3000 --name thing-server mitchallen/thing-server
 
