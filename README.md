@@ -8,15 +8,19 @@ A simple REST API server for returning JSON things.
 
     docker pull mitchallen/thing-server:latest
 
-### Run the image locally
+### Run the image locally as a container
+
+This will pull the image down from the repo if you didn't already.
 
 This example runs the server locally on port 1234.
 
     docker run -d -p 1234:3000 --name thing-server mitchallen/thing-server
 
-If you do this twice you will get an error because the port is in use. 
+From the doc:
 
-To restart, stop the container then remove (rm) it.
+* https://docs.docker.com/engine/reference/commandline/run/#parent-command
+
+*The docker run command first creates a writeable container layer over the specified image, and then starts it using the specified command. That is, docker run is equivalent to the API /containers/create then /containers/(id)/start. A stopped container can be restarted with all its previous changes intact using docker start. See docker ps -a to view a list of all containers.*
 
 ### Confirm image is running
 
