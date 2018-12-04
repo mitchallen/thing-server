@@ -47,4 +47,6 @@ Assumes container is running and set to port 1234.
 
 ### Remove Image
 
+    docker stop thing-server
+    docker rm thing-server
     docker rmi mitchallen/thing-server
