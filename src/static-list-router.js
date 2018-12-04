@@ -9,7 +9,16 @@ module.exports.create = (spec) => {
     const version = spec.version || '0.0.1';
     const label = spec.label || 'objects';
     const route = spec.router || '/api';
-    const list = spec.list|| [{id: 1, title: "TODO" }];
+    const list = spec.list || [{id: 1, title: "TODO" }];
+    const port = spec.port || '';   // for console instructions
+
+    console.log("vvv --- EXAMPLES --- vvv");
+    console.log(`curl http://localhost:${port}/`);
+    console.log(`curl http://localhost:${port}${route}`);
+    console.log(`curl http://localhost:${port}${route}/${label}`);
+    console.log(`curl http://localhost:${port}${route}/${label}/count`);
+    console.log(`curl http://localhost:${port}${route}/${label}/1`);
+    console.log("^^ --- ^^^^^^^^ --- ^^^");
 
     listRouter.get('/', function(req, res) {
         res.json({ 
@@ -19,7 +28,7 @@ module.exports.create = (spec) => {
             route: route 
         });   
     });
-    
+
     listRouter.get(`/${label}`, (req, res) => {
         res.json( list );   
     });
