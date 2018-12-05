@@ -22,6 +22,12 @@ From the doc:
 
 *The docker run command first creates a writeable container layer over the specified image, and then starts it using the specified command. That is, docker run is equivalent to the API /containers/create then /containers/(id)/start. A stopped container can be restarted with all its previous changes intact using docker start. See docker ps -a to view a list of all containers.*
 
+### Rerun with the same or a new container
+
+    docker stop thing-server
+    docker rm thing-server
+    docker run -d -p 1234:3000 --name thing-server mitchallen/thing-server
+
 ### Confirm image is running
 
     docker ps
@@ -54,3 +60,37 @@ Assumes container is running and set to port 1234.
     docker stop thing-server
     docker rm thing-server
     docker rmi mitchallen/thing-server
+
+* * *
+
+### Automated Docker Builds
+
+New builds of the image are created automatically using Docker Cloud.
+
+To trigger a new build via a github tag I do the following (using v1.0.6 as an example):
+
+*NOTE: using annotated tags didn't trigger a new build. Use the simpler format only.*
+
+Tags must match this format to trigger a build: /v[0-9.]+$/ 
+
+    git checkout master
+    git tag v1.0.6
+    git push origin --tags
+
+This triggers two new builds of the Docker image: __v1.0.6__ and __latest__
+
+Docker Cloud:
+
+* https://cloud.docker.com
+
+My Docker Hub page:
+
+* https://hub.docker.com/u/mitchallen/
+
+Docker Hub page for this image
+
+* https://hub.docker.com/r/mitchallen/thing-server/
+
+Docker Hub page for this images tags
+
+* https://hub.docker.com/r/mitchallen/thing-server/tags/
