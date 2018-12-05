@@ -2,10 +2,11 @@ const express = require('express'),
     app = express(),
     things = require('./data/v1/things.json'),
     staticListRouter = require('./static-list-router'),
+    uptime = require('./uptime'),
     PORT = process.env.PORT || 3000;
 
 const APP_NAME = 'thing-server';
-const APP_VERSION = '1.0.7';    // TODO automate incrementing
+const APP_VERSION = '1.0.8';    // TODO automate incrementing
 const THINGS_PATH = '/v1';
 
 let routerThings = staticListRouter.create({
@@ -20,7 +21,12 @@ let routerThings = staticListRouter.create({
 app.use( THINGS_PATH, routerThings );
 
 app.get('/', function(req, res) {
-    res.json({ status: 'OK', app: APP_NAME, version: APP_VERSION, route: "/" });   
+    res.json({ 
+        status: 'OK', 
+        app: APP_NAME, 
+        version: APP_VERSION, 
+        uptime: uptime.uptime(),
+        route: "/" });   
 });
 
 // 404 - MUST BE LAST
