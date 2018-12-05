@@ -2,6 +2,10 @@
 
 A simple REST API server for returning JSON things.
 
+<a href="https://hub.docker.com/r/mitchallen/thing-server/">
+<img src="https://img.shields.io/badge/mitchallen-thing--server-green.svg?logo=docker&style=for-the-badge" />
+</a>
+
 ## To Use
 
 ### Pull the image from the repo
