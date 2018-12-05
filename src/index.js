@@ -5,7 +5,7 @@ const express = require('express'),
     PORT = process.env.PORT || 3000;
 
 const APP_NAME = 'thing-server';
-const APP_VERSION = '1.0.6';    // TODO automate incrementing
+const APP_VERSION = '1.0.7';    // TODO automate incrementing
 const THINGS_PATH = '/v1';
 
 let routerThings = staticListRouter.create({
