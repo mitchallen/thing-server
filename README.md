@@ -73,7 +73,7 @@ New builds of the image are created automatically using Docker Cloud.
 
 To trigger a new build via a github tag I do the following (using v1.0.6 as an example):
 
-*NOTE: using annotated tags didn't trigger a new build. Use the simpler format only.*
+*NOTE: using annotated tags didn't trigger a new build. Use the simpler format.*
 
 Tags must match this format to trigger a build: /v[0-9.]+$/ 
 
@@ -98,3 +98,11 @@ Docker Hub page for this image
 Docker Hub page for this images tags
 
 * https://hub.docker.com/r/mitchallen/thing-server/tags/
+
+* * *
+
+### Watch
+
+Watch uptime change every second
+
+    watch -n 1 curl http://localhost:3000/
