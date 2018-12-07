@@ -1,12 +1,12 @@
 const express = require('express'),
     app = express(),
+    uptime = require('@mitchallen/uptime'),
     things = require('./data/v1/things.json'),
     staticListRouter = require('./static-list-router'),
-    uptime = require('./uptime'),
     PORT = process.env.PORT || 3000;
 
 const APP_NAME = 'thing-server';
-const APP_VERSION = '1.0.8';    // TODO automate incrementing
+const APP_VERSION = '1.0.9';    // TODO automate incrementing
 const THINGS_PATH = '/v1';
 
 let routerThings = staticListRouter.create({
@@ -25,7 +25,7 @@ app.get('/', function(req, res) {
         status: 'OK', 
         app: APP_NAME, 
         version: APP_VERSION, 
-        uptime: uptime.uptime(),
+        uptime: uptime.toHHMMSS(),
         route: "/" });   
 });
 
