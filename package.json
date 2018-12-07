@@ -1,6 +1,6 @@
 {
   "name": "thing-server",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A simple REST API server for returning JSON things",
   "main": "src/index.js",
   "scripts": {
@@ -12,7 +12,10 @@
     "docker:run": "docker run -d -p 1234:3000 --name thing-server mitchallen/thing-server",
     "docker:start": "docker start thing-server",
     "docker:stop": "docker stop thing-server",
-    "docker:rm": "docker rm thing-server"
+    "docker:rm": "docker rm thing-server",
+    "//": "may have to install watch utitlity",
+    "watch:local": "watch -n 1 curl http://localhost:3000/",
+    "watch:container": "watch -n 1 curl http://localhost:1234/"
   },
   "keywords": [],
   "repository": {
@@ -22,6 +25,7 @@
   "author": "Mitch Allen <npm@mitchallen.com> (http://mitchallen.com)",
   "license": "MIT",
   "dependencies": {
+    "@mitchallen/uptime": "0.0.6",
     "body-parser": "^1.18.3",
     "express": "^4.16.4"
   },
