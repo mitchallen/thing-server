@@ -124,7 +124,7 @@ curl http://localhost:8100/v2/pets/1
 
 ### Running Multiple Containers
 
-You can run multiple containers on multiple ports like things:
+You can run multiple containers on multiple ports like this:
 
 ```
 docker run -p 8101:3000 -v ${PWD}/dogs:/usr/src/app/data --name dog-things mitchallen/thing-server
@@ -132,9 +132,9 @@ docker run -p 8101:3000 -v ${PWD}/dogs:/usr/src/app/data --name dog-things mitch
 docker run -p 8102:3000 -v ${PWD}/cats:/usr/src/app/data --name cat-things mitchallen/thing-server
 ``` 
 
-The servers would look for 
+The servers would look for: 
 
-* __./dogs/things.json___
+* __./dogs/things.json__
 * __./cats/things.json__
 
 * * *
@@ -143,9 +143,13 @@ The servers would look for
 
     docker stop thing-server
     docker stop pet-things
+    docker stop dog-things
+    docker stop cat-things
 
     docker start thing-server
     docker start pet-things
+    docker start dog-things
+    docker start cat-things
     
 * * *
 
