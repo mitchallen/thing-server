@@ -1,0 +1,22 @@
+{
+    "label": "pets",
+    "path": "/v2",
+    "list": [
+        {
+            "name": "Pepper",
+            "age": 19
+        },
+        {
+            "name": "Marchio",
+            "age": 20
+        },
+        {
+            "name": "Richmond",
+            "age": 7
+        },
+        {
+            "name": "Bonnie",
+            "age": 18
+        }
+    ]
+}
