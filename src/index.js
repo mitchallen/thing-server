@@ -1,24 +1,32 @@
 const express = require('express'),
     app = express(),
+    fs = require("fs"),
     uptime = require('@mitchallen/uptime'),
-    things = require('./data/v1/things.json'),
     staticListRouter = require('./static-list-router'),
     PORT = process.env.PORT || 3000;
 
 const APP_NAME = 'thing-server';
-const APP_VERSION = '1.0.9';    // TODO automate incrementing
-const THINGS_PATH = '/v1';
+const APP_VERSION = require("./../package").version;   
+
+const THINGSFILE = process.env.THINGSFILE || './data/things.json';
+
+var contents = fs.readFileSync(`${THINGSFILE}`);
+var thingsData = JSON.parse(contents);
+
+thingsLabel = thingsData.label || 'things';
+thingsPath  = thingsData.path || '/v1';
+thingsList  = thingsData.list || [];
 
 let routerThings = staticListRouter.create({
     appName: APP_NAME,
     version: APP_VERSION,
-    label: 'things',
-    path: THINGS_PATH,
-    list: things,
+    label: thingsLabel,
+    path: thingsPath,
+    list: thingsList,
     port: PORT  // for console instructions
 });
 
-app.use( THINGS_PATH, routerThings );
+app.use( thingsPath, routerThings );
 
 app.get('/', function(req, res) {
     res.json({ 
@@ -26,7 +34,13 @@ app.get('/', function(req, res) {
         app: APP_NAME, 
         version: APP_VERSION, 
         uptime: uptime.toHHMMSS(),
-        route: "/" });   
+        route: "/",
+        meta: {
+            label: thingsLabel,
+            path: thingsPath,
+            count: thingsList.length
+        }
+     });   
 });
 
 // 404 - MUST BE LAST

@@ -1,0 +1,18 @@
+{
+    "label": "things",
+    "path": "/v1",
+    "list": [
+        {
+            "title": "alpha",
+            "value": 100
+        },
+        {
+            "title": "beta",
+            "value": 200
+        },
+        {
+            "title": "gamma",
+            "value": 300
+        }
+    ]
+}
