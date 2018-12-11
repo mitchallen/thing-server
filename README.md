@@ -200,10 +200,3 @@ Docker Hub page for this images tags
 
 * https://hub.docker.com/r/mitchallen/thing-server/tags/
 
-* * *
-
-### Watch
-
-Watch uptime change every second
-
-    watch -n 1 curl http://localhost:3000/
