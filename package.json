@@ -1,6 +1,6 @@
 {
   "name": "thing-server",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "A simple REST API server for returning JSON things",
   "main": "src/index.js",
   "scripts": {
@@ -29,6 +29,7 @@
   "dependencies": {
     "@mitchallen/uptime": "0.0.8",
     "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
     "express": "^4.16.4"
   },
   "devDependencies": {
