@@ -1,5 +1,6 @@
 const express = require('express'),
     app = express(),
+    cors = require('cors'),
     fs = require("fs"),
     uptime = require('@mitchallen/uptime'),
     staticListRouter = require('./static-list-router'),
@@ -25,6 +26,8 @@ let routerThings = staticListRouter.create({
     list: thingsList,
     port: PORT  // for console instructions
 });
+
+app.use(cors());
 
 app.use( thingsPath, routerThings );
 
