@@ -22,7 +22,11 @@ This will pull the image down from the repo if you didn't already.
 
 This example runs the server locally on port 1234.
 
-    docker run -p 1234:3000 --name thing-server mitchallen/thing-server
+    docker run -p 1234:3000 --name thing-server ghcr.io/mitchallen/thing-server:latest
+
+You can also run the Docker Hub image instead:
+
+    docker run -p 1234:3000 --name thing-server mitchallen/thing-server:latest
 
 From the doc:
 
@@ -37,7 +41,7 @@ From the doc:
 ```
 docker stop thing-server
 docker rm thing-server
-docker run -p 1234:3000 --name thing-server mitchallen/thing-server
+docker run -p 1234:3000 --name thing-server ghcr.io/mitchallen/thing-server:latest
 ```
 
 * * *
