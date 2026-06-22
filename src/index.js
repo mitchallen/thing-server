@@ -47,7 +47,8 @@ app.get('/', function(req, res) {
 });
 
 // 404 - MUST BE LAST
-app.get('*', function(req, res) {
+// Express 5 (path-to-regexp v8) requires a named wildcard, not bare '*'
+app.get('/*splat', function(req, res) {
     res.status( 404 ).json({ 
         status: '404', 
         error: 'not found',
