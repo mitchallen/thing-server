@@ -64,6 +64,24 @@ The root endpoint also advertises the explorer path in its `explorer` field.
 
 * * *
 
+### Require an API key
+
+The things routes can require an `x-api-key` header. Enforcement is **off by default** and turns on only when you set the `API_KEY` environment variable at launch:
+
+```sh
+docker run -p 1234:3000 -e API_KEY=your-secret-key --name thing-server ghcr.io/mitchallen/thing-server:latest
+```
+
+With `API_KEY` set, requests to the things routes must send a matching header or receive `401 unauthorized`:
+
+```sh
+curl -H "x-api-key: your-secret-key" http://localhost:1234/v1/things
+```
+
+The root (`/`) health check and the Swagger explorer (`/api-docs`) remain open regardless. If `API_KEY` is not set, the API is open (no key required).
+
+* * *
+
 ### Test with curl commands
 
 Assumes container is running and set to port 1234.

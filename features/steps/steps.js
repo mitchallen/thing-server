@@ -1,4 +1,4 @@
-const { When, Then } = require('@cucumber/cucumber');
+const { Before, Given, When, Then } = require('@cucumber/cucumber');
 const assert = require('node:assert');
 const request = require('supertest');
 
@@ -10,8 +10,26 @@ function getProp(obj, path) {
     return path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
 }
 
+// Each scenario starts with enforcement off so scenarios are isolated; auth
+// scenarios opt in via "the API key is ...".
+Before(function () {
+    delete process.env.API_KEY;
+});
+
+Given('no API key is configured', function () {
+    delete process.env.API_KEY;
+});
+
+Given('the API key is {string}', function (key) {
+    process.env.API_KEY = key;
+});
+
 When('I GET {string}', async function (path) {
     this.response = await request(app).get(path);
+});
+
+When('I GET {string} with api key {string}', async function (path, key) {
+    this.response = await request(app).get(path).set('x-api-key', key);
 });
 
 Then('the response status should be {int}', function (status) {
