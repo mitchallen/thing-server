@@ -1,14 +1,18 @@
 # thing-server
 
+[![GitHub tag](https://img.shields.io/github/v/tag/mitchallen/thing-server?sort=semver&label=version)](https://github.com/mitchallen/thing-server/tags) [![Docker Hub](https://img.shields.io/docker/v/mitchallen/thing-server?sort=semver&label=docker%20hub)](https://hub.docker.com/r/mitchallen/thing-server)
+
 A simple REST API server for returning JSON things.
 
-<a href="https://hub.docker.com/r/mitchallen/thing-server/">
-<img src="https://img.shields.io/badge/mitchallen-thing--server-green.svg?logo=docker&style=for-the-badge" />
-</a>
+* * *
 
 ## Usage
 
 ### Pull the image from the repo
+
+    docker pull ghcr.io/mitchallen/thing-server:latest
+
+### To pull docker hub versions:
 
     docker pull mitchallen/thing-server:latest
 
@@ -168,35 +172,36 @@ The servers would look for:
 
 * * *
 
-### Automated Docker Builds
+## Publish
 
-New builds of the image are created automatically using Docker Cloud.
+Builds are automated via GitHub Actions and triggered by pushing a version tag.
 
-To trigger a new build via a github tag I do the following (using v1.0.6 as an example):
+Bump the version, commit, tag, and push:
 
-*NOTE: using annotated tags didn't trigger a new build. Use the simpler format.*
+```sh
+npm version patch --no-git-tag-version
+git add package.json package-lock.json
+git commit -m "1.x.x"
+git tag v1.x.x
+git push origin master
+git push origin v1.x.x
+```
 
-Tags must match this format to trigger a build: /v[0-9.]+$/ 
+Tags matching `v*` trigger two workflows that build and push multi-platform (`linux/amd64`, `linux/arm64`) images to:
 
-    git checkout master
-    git tag v1.0.6
-    git push origin --tags
+* **GitHub Container Registry:** `ghcr.io/mitchallen/thing-server`
+* **Docker Hub:** `mitchallen/thing-server`
 
-This triggers two new builds of the Docker image: __v1.0.6__ and __latest__
+Each publish creates both a versioned tag and updates `latest`.
 
-Docker Cloud:
+The Docker Hub workflow also syncs this README to the [Docker Hub repository description](https://hub.docker.com/r/mitchallen/thing-server).
 
-* https://cloud.docker.com
+### Required secrets
 
-My Docker Hub page:
+The Docker Hub workflow needs these repository secrets (Settings → Secrets and variables → Actions):
 
-* https://hub.docker.com/u/mitchallen/
+* `DOCKERHUB_USERNAME` — your Docker Hub username
+* `DOCKERHUB_TOKEN` — a Docker Hub access token
 
-Docker Hub page for this image
-
-* https://hub.docker.com/r/mitchallen/thing-server/
-
-Docker Hub page for this images tags
-
-* https://hub.docker.com/r/mitchallen/thing-server/tags/
+The GitHub Container Registry workflow uses the built-in `GITHUB_TOKEN`; no extra secret is required.
 

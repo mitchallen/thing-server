@@ -1,0 +1,40 @@
+name: publish-dockerhub
+on:
+  push:
+    tags:
+      - 'v*' # Trigger the workflow when a tag starting with "v" is pushed
+
+jobs:
+  publish-dockerhub-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image to Docker Hub
+        run: |
+          tag=${GITHUB_REF#refs/tags/}
+          tag=${tag:1}
+          image=docker.io/mitchallen/thing-server
+          docker buildx create --use
+          docker buildx build --platform linux/amd64,linux/arm64 \
+            -t ${image}:${tag} \
+            -t ${image}:latest \
+            --push .
+
+      - name: Update Docker Hub README
+        uses: peter-evans/dockerhub-description@v5
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: mitchallen/thing-server
+          readme-filepath: ./README.md
