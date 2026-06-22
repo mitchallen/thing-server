@@ -1,7 +1,7 @@
 # docker build -t <your username>/thing-server .
 # docker run -p 1234:3000 -d <your username>/thing-server
 
-FROM node:22-alpine
+FROM node:26-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
