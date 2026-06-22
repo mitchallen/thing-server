@@ -1,7 +1,7 @@
 # docker build -t <your username>/thing-server .
 # docker run -p 1234:3000 -d <your username>/thing-server
 
-FROM node:8-alpine
+FROM node:22-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -10,7 +10,7 @@ WORKDIR /usr/src/app
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
 
-RUN npm install --production
+RUN npm ci --omit=dev
 
 # Bundle app source
 COPY . .
