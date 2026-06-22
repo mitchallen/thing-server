@@ -1,2 +1,9 @@
 node_modules
 npm-debug.log
+
+# Test / CI / dev files not needed in the runtime image
+features
+test
+cucumber.json
+.github
+.git
