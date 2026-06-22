@@ -22,7 +22,11 @@ This will pull the image down from the repo if you didn't already.
 
 This example runs the server locally on port 1234.
 
-    docker run -p 1234:3000 --name thing-server mitchallen/thing-server
+    docker run -p 1234:3000 --name thing-server ghcr.io/mitchallen/thing-server:latest
+
+You can also run the Docker Hub image instead:
+
+    docker run -p 1234:3000 --name thing-server mitchallen/thing-server:latest
 
 From the doc:
 
@@ -37,7 +41,7 @@ From the doc:
 ```
 docker stop thing-server
 docker rm thing-server
-docker run -p 1234:3000 --name thing-server mitchallen/thing-server
+docker run -p 1234:3000 --name thing-server ghcr.io/mitchallen/thing-server:latest
 ```
 
 * * *
@@ -103,12 +107,12 @@ Paste into things.json this JSON content and save it:
 
 You can change the data if you like, but remember the following:
 
-* __label__ is used in the url (http://localhost:1234/v2/__pets__/count)
-* __path__ is the root url (http://localhost:1234/__v2__/pets/1)
+* __label__ is used in the url — e.g. `http://localhost:1234/v2/pets/count` (here `pets` is the label)
+* __path__ is the root of the url — e.g. `http://localhost:1234/v2/pets/1` (here `/v2` is the path)
 * __list__ must be an array of objects
 * the list objects can have any properties and don't even need to have the same properties.
 
-Now run the following to build a new container named __pet-things___
+Now run the following to build a new container named __pet-things__
 
 ```
 docker run -p 8100:3000 -v ${PWD}/pets:/usr/src/app/data --name pet-things mitchallen/thing-server
