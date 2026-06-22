@@ -199,7 +199,7 @@ npm version patch --no-git-tag-version
 git add package.json package-lock.json
 git commit -m "1.x.x"
 git tag v1.x.x
-git push origin master
+git push origin main
 git push origin v1.x.x
 ```
 
