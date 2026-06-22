@@ -1,0 +1,26 @@
+paths:
+  /:
+    get:
+      summary: Get the service status
+      tags:
+        - service health
+      responses:
+        200:
+          description: Service status
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: OK
+                  app: thing-server
+                  version: 1.0.0
+                  uptime: 00:00:31
+                  route: /
+                  explorer: /api-docs
+                  meta:
+                    label: things
+                    path: /v1
+                    count: 3
+        500:
+          description: Internal service error

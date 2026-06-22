@@ -52,6 +52,18 @@ docker run -p 1234:3000 --name thing-server ghcr.io/mitchallen/thing-server:late
     
 * * *
 
+### Swagger Explorer
+
+Once the container is running, the interactive API explorer is available at:
+
+```
+http://localhost:1234/api-docs
+```
+
+The root endpoint also advertises the explorer path in its `explorer` field.
+
+* * *
+
 ### Test with curl commands
 
 Assumes container is running and set to port 1234.
