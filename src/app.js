@@ -68,6 +68,27 @@ app.use(
     swaggerUi.setup(swaggerDocs, customSwaggerOptions)
 );
 
+// Optional API key. When API_KEY is set, the things routes require a matching
+// x-api-key header; when unset, the API is open (no enforcement). The root (/)
+// and the swagger explorer remain open either way.
+function apiKeyGuard(req, res, next) {
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+        return next();
+    }
+    if (req.header('x-api-key') === apiKey) {
+        return next();
+    }
+    return res.status(401).json({
+        status: '401',
+        error: 'unauthorized',
+        app: APP_NAME,
+        version: APP_VERSION
+    });
+}
+
+app.use( thingsPath, apiKeyGuard );
+
 app.use( thingsPath, routerThings );
 
 app.get('/', function(req, res) {
