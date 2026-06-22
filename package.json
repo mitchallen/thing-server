@@ -30,7 +30,7 @@
     "@mitchallen/uptime": "0.0.8",
     "body-parser": "^1.20.5",
     "cors": "^2.8.5",
-    "express": "^4.22.2"
+    "express": "^5.2.1"
   },
   "devDependencies": {
     "c8": "^10.1.3",
