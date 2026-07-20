@@ -34,7 +34,7 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "@cucumber/cucumber": "^13.0.0",
+    "@cucumber/cucumber": "^13.2.0",
     "c8": "^11.0.0",
     "supertest": "^7.1.4"
   }
