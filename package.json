@@ -27,7 +27,6 @@
   "license": "MIT",
   "dependencies": {
     "@mitchallen/uptime": "0.0.8",
-    "body-parser": "^1.20.5",
     "cors": "^2.8.5",
     "express": "^5.2.1",
     "swagger-jsdoc": "^6.3.0",
