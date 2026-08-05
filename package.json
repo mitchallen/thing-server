@@ -48,5 +48,18 @@
     "copyfiles": "^2.4.1",
     "supertest": "^7.1.4",
     "typescript": "^5.9.3"
+  },
+  "c8": {
+    "include": [
+      "dist/**/*.js"
+    ],
+    "exclude": [
+      "features/**",
+      "dist/**/*.js.map"
+    ],
+    "reporter": [
+      "text",
+      "lcov"
+    ]
   }
 }
