@@ -6,7 +6,6 @@ export interface StaticListRouterSpec {
     label?: string;
     path?: string;
     list?: { [key: string]: any }[];
-    port?: string | number;   // for console instructions
 }
 
 export const create = (spec: StaticListRouterSpec = {}) => {
@@ -16,19 +15,10 @@ export const create = (spec: StaticListRouterSpec = {}) => {
         version = '0.0.1',
         label = 'objects',
         path = '/api',
-        list = [{ id: 1, title: "TODO" }],
-        port = ''
+        list = [{ id: 1, title: "TODO" }]
     } = spec;
 
     const listRouter = Router();
-
-    console.log("vvv --- EXAMPLES --- vvv");
-    console.log(`curl http://localhost:${port}/`);
-    console.log(`curl http://localhost:${port}${path}`);
-    console.log(`curl http://localhost:${port}${path}/${label}`);
-    console.log(`curl http://localhost:${port}${path}/${label}/count`);
-    console.log(`curl http://localhost:${port}${path}/${label}/1`);
-    console.log("^^ --- ^^^^^^^^ --- ^^^");
 
     listRouter.get('/', (req: Request, res: Response) => {
         res.json({

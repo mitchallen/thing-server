@@ -82,6 +82,50 @@ The root (`/`) health check and the Swagger explorer (`/api-docs`) remain open r
 
 * * *
 
+### Override APP_NAME
+
+The server reports its name as `thing-server` in the root response and in error bodies. Set `APP_NAME` to override it:
+
+```sh
+docker run -p 1234:3000 -e APP_NAME=widget-server --name thing-server ghcr.io/mitchallen/thing-server:latest
+```
+
+```sh
+curl http://localhost:1234/
+{"status":"OK","app":"widget-server", ... }
+```
+
+The name also appears in the `401 unauthorized` and `404 not found` bodies, and as the Swagger explorer's page title.
+
+* * *
+
+### Mount under a base path
+
+By default the API lives at the root: `/`, `/v1/things`, `/api-docs`. Set `BASE_PATH` to move the whole API — root, things routes and explorer — under a sub-path, which is useful behind a reverse proxy that routes several services by prefix:
+
+```sh
+docker run -p 1234:3000 -e BASE_PATH=/api/svc1 --name thing-server ghcr.io/mitchallen/thing-server:latest
+```
+
+```sh
+curl http://localhost:1234/api/svc1
+curl http://localhost:1234/api/svc1/v1/things
+curl http://localhost:1234/api/svc1/v1/things/count
+```
+
+The explorer moves too, to `http://localhost:1234/api/svc1/api-docs`, and the generated OpenAPI spec records the base path as its server URL. A trailing slash is tolerated (`/api/svc1/` behaves the same as `/api/svc1`).
+
+Note that `BASE_PATH` is a **prefix**: it stacks on top of the `path` from your data file, so the default `path` of `/v1` becomes `/api/svc1/v1`. Once `BASE_PATH` is set the un-prefixed routes no longer resolve. The root response reports the resolved values in `route`, `explorer` and `meta.path`:
+
+```sh
+curl http://localhost:1234/api/svc1
+{"status":"OK","app":"thing-server","route":"/api/svc1","explorer":"/api/svc1/api-docs","meta":{"label":"things","path":"/api/svc1/v1","count":3}}
+```
+
+Unset, both `APP_NAME` and `BASE_PATH` leave every route and response exactly as before.
+
+* * *
+
 ### Test with curl commands
 
 Assumes container is running and set to port 1234.
