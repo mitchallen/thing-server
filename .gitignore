@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Build output (rebuilt by `npm run build`; the Docker builder stage makes its own)
+dist/
+
 # Logs
 logs/
 *.log

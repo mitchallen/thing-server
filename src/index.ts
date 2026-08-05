@@ -1,4 +1,4 @@
-const app = require('./app');
+import app = require('./app');
 
 const APP_NAME = 'thing-server';
 const APP_VERSION = require("./../package").version;
@@ -8,7 +8,7 @@ const server = app.listen(PORT, () => console.log(`${APP_NAME}:${APP_VERSION} - 
 
 // Graceful shutdown: stop accepting connections and exit once in-flight
 // requests have drained.
-function shutdown(signal) {
+function shutdown(signal: string) {
     console.log(`\n${signal} signal received: closing HTTP server`);
     server.close(() => {
         console.log('HTTP server closed');
