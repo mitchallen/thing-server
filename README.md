@@ -64,6 +64,22 @@ The root endpoint also advertises the explorer path in its `explorer` field.
 
 * * *
 
+### Environment variables
+
+All configuration is optional — unset, the server serves the bundled data set at the root with no authentication.
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `PORT` | `3000` | Port the server listens on *inside* the container. Map it with `docker run -p <host>:3000`. |
+| `THINGSFILE` | `./data/things.json` | Path to the data file. Usually left alone and overridden with a volume mount instead — see [Running with your own things](#running-with-your-own-things). |
+| `API_KEY` | *unset* | When set, the things routes require a matching `x-api-key` header. See [Require an API key](#require-an-api-key). |
+| `APP_NAME` | `thing-server` | Name reported in the root, `404` and `401` bodies. See [Override APP_NAME](#override-app_name). |
+| `BASE_PATH` | `/` | Mounts the whole API under a sub-path. See [Mount under a base path](#mount-under-a-base-path). |
+
+The data file itself supplies the `label` (`things`) and `path` (`/v1`) segments of the routes; `BASE_PATH` is applied as a prefix on top of those.
+
+* * *
+
 ### Require an API key
 
 The things routes can require an `x-api-key` header. Enforcement is **off by default** and turns on only when you set the `API_KEY` environment variable at launch:
