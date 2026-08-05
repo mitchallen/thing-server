@@ -1,6 +1,7 @@
 {
   "name": "thing-server",
   "version": "1.0.22",
+  "private": true,
   "description": "A simple REST API server for returning JSON things",
   "main": "src/index.js",
   "scripts": {
