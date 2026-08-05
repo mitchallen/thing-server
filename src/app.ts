@@ -1,12 +1,14 @@
-const express = require('express'),
-    app = express(),
-    cors = require('cors'),
-    fs = require("fs"),
-    uptime = require('@mitchallen/uptime'),
-    swaggerJsdoc = require('swagger-jsdoc'),
-    swaggerUi = require('swagger-ui-express'),
-    staticListRouter = require('./static-list-router'),
-    PORT = process.env.PORT || 3000;
+import express, { Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import fs from 'fs';
+import uptime from '@mitchallen/uptime';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import * as staticListRouter from './static-list-router';
+
+const app = express();
+
+const PORT = process.env.PORT || 3000;
 
 const APP_NAME = 'thing-server';
 const APP_VERSION = require("./../package").version;
@@ -34,23 +36,31 @@ const swaggerOptions = {
             description: API_TAG_LINE,
         },
     },
+    // The yaml files are copied into dist/ by the build, alongside the
+    // compiled js; these paths are resolved against the process cwd.
     apis: [
-        './src/root.yaml',
-        './src/things.yaml',
+        './dist/root.yaml',
+        './dist/things.yaml',
         // put future route yaml here
     ],
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
-var contents = fs.readFileSync(`${THINGSFILE}`);
-var thingsData = JSON.parse(contents);
+interface ThingsData {
+    label?: string;
+    path?: string;
+    list?: { [key: string]: any }[];
+}
 
-thingsLabel = thingsData.label || 'things';
-thingsPath  = thingsData.path || '/v1';
-thingsList  = thingsData.list || [];
+const contents = fs.readFileSync(`${THINGSFILE}`);
+const thingsData: ThingsData = JSON.parse(contents.toString());
 
-let routerThings = staticListRouter.create({
+const thingsLabel = thingsData.label || 'things';
+const thingsPath  = thingsData.path || '/v1';
+const thingsList  = thingsData.list || [];
+
+const routerThings = staticListRouter.create({
     appName: APP_NAME,
     version: APP_VERSION,
     label: thingsLabel,
@@ -71,7 +81,7 @@ app.use(
 // Optional API key. When API_KEY is set, the things routes require a matching
 // x-api-key header; when unset, the API is open (no enforcement). The root (/)
 // and the swagger explorer remain open either way.
-function apiKeyGuard(req, res, next) {
+function apiKeyGuard(req: Request, res: Response, next: NextFunction) {
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
         return next();
@@ -91,7 +101,7 @@ app.use( thingsPath, apiKeyGuard );
 
 app.use( thingsPath, routerThings );
 
-app.get('/', function(req, res) {
+app.get('/', function(req: Request, res: Response) {
     res.json({
         status: 'OK',
         app: APP_NAME,
@@ -109,7 +119,7 @@ app.get('/', function(req, res) {
 
 // 404 - MUST BE LAST
 // Express 5 (path-to-regexp v8) requires a named wildcard, not bare '*'
-app.get('/*splat', function(req, res) {
+app.get('/*splat', function(req: Request, res: Response) {
     res.status( 404 ).json({
         status: '404',
         error: 'not found',
@@ -118,4 +128,4 @@ app.get('/*splat', function(req, res) {
      });
 });
 
-module.exports = app;
+export = app;

@@ -2,8 +2,10 @@ const { Before, Given, When, Then } = require('@cucumber/cucumber');
 const assert = require('node:assert');
 const request = require('supertest');
 
-// Import the Express app directly so tests run in-process (no running container).
-const app = require('../../src/app');
+// Import the built Express app directly so tests run in-process (no running
+// container). `pretest` compiles src/*.ts into dist/ first, so this exercises
+// the same artifact the Docker image ships.
+const app = require('../../dist/app');
 
 // Resolve a dot-path (e.g. "meta.count") against an object.
 function getProp(obj, path) {
