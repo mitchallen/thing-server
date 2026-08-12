@@ -33,10 +33,13 @@ Run `gh issue list` for the current state. There are currently no open issues.
   was a recurring source of Dependabot alerts. Don't reintroduce it — add new
   route docs as a fragment in `src/openapi/` and register it in `fragments`.
 - **Tests:** `npm test` (Cucumber, `features/`). `pretest` runs the build, and
-  the steps import `createApp` from `dist/app` and drive it in-process via
-  supertest, so tests exercise the same compiled artifact the image ships.
+  the steps import `createApp` from `dist/app` and drive it in-process, so tests
+  exercise the same compiled artifact the image ships. Requests go through
+  `node:http` + the global `fetch` — deliberately dependency-free, replacing
+  supertest and its superagent/form-data chain; keep it that way.
   A shared default app is reused; scenarios that set `APP_NAME`/`BASE_PATH` get
-  their own instance. Step definitions stay plain JS.
+  their own instance, each with its own listener closed in `AfterAll`.
+  Step definitions stay plain JS.
   CI (`.github/workflows/test.yml`) runs on push/PR to `main`.
 - **Release:** bump the version and push a `v*` tag → the publish workflows build
   and push multi-platform images to GHCR + Docker Hub and sync the README to
