@@ -1,6 +1,6 @@
 {
   "name": "thing-server",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "private": true,
   "description": "A simple REST API server for returning JSON things",
   "main": "dist/index.js",
