@@ -31,7 +31,6 @@
   "author": "Mitch Allen <npm@mitchallen.com> (http://mitchallen.com)",
   "license": "MIT",
   "dependencies": {
-    "@mitchallen/uptime": "0.0.8",
     "cors": "^2.8.5",
     "express": "^5.2.1",
     "swagger-ui-express": "^5.0.1"
@@ -43,7 +42,7 @@
     "@types/node": "^26.1.2",
     "@types/swagger-ui-express": "^4.1.8",
     "c8": "^12.0.0",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   },
   "c8": {
     "include": [

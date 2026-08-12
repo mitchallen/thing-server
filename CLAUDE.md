@@ -26,6 +26,18 @@ Run `gh issue list` for the current state. There are currently no open issues.
   rebuilt by CI and the Docker builder stage. There is no asset-copy step —
   keep it that way; anything the runtime needs should be a `.ts` module that
   `tsc` compiles, not a file that has to be copied alongside.
+- **tsconfig:** set options *explicitly*, never by default. TS 6 changed a pile
+  of defaults (`strict` off→on, `module` commonjs→esnext, `target`→current-year
+  ES, `rootDir`→`./`), so anything inherited silently changes meaning on a
+  compiler bump. `strict`, `module`, `target` and `rootDir` are all pinned here
+  for that reason. Under `strict`, an untyped JS dependency fails the build with
+  TS7016 — either vendor it (see `src/uptime.ts`) or add a `src/types/*.d.ts`.
+- **Runtime deps are deliberately minimal:** `express`, `cors` and
+  `swagger-ui-express`, nothing else. `src/uptime.ts` is vendored from
+  `@mitchallen/uptime` 0.0.8 (MIT, same author) rather than depended on — a
+  dozen lines was not worth a package. Prefer vendoring or the Node stdlib over
+  adding a dependency; this repo has a history of Dependabot churn from
+  transitive trees far larger than the code they served.
 - **OpenAPI:** the spec lives in `src/openapi/` as plain TS objects — one
   fragment per route group (`root.ts`, `things.ts`), merged by `buildSpec()` in
   `index.ts` and handed to `swagger-ui-express`. This replaced `swagger-jsdoc`,
