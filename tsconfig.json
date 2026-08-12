@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    // Set explicitly rather than inherited: TS 5.x defaulted strict off and
+    // TS 6+ defaults it on, so relying on the default silently changes what
+    // the build enforces across a compiler upgrade.
+    "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "target": "ES6",

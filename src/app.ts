@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import fs from 'fs';
-import uptime from '@mitchallen/uptime';
+import * as uptime from './uptime';
 import swaggerUi from 'swagger-ui-express';
 import { buildSpec } from './openapi';
 import * as staticListRouter from './static-list-router';
