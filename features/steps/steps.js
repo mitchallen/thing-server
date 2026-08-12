@@ -1,6 +1,6 @@
-const { Before, Given, When, Then } = require('@cucumber/cucumber');
+const { Before, AfterAll, Given, When, Then } = require('@cucumber/cucumber');
 const assert = require('node:assert');
-const request = require('supertest');
+const http = require('node:http');
 
 // Import the built app factory directly so tests run in-process (no running
 // container). `pretest` compiles src/*.ts into dist/ first, so this exercises
@@ -21,6 +21,55 @@ function getApp() {
     }
     return defaultApp;
 }
+
+// One listener per app instance, started lazily on an ephemeral loopback port
+// and reused for the rest of the run. supertest used to stand one up per
+// request; doing it here keeps the dev tree free of superagent and its
+// form-data / cookiejar chain.
+const servers = new Map();
+
+function listen(app) {
+    let pending = servers.get(app);
+    if (!pending) {
+        pending = new Promise((resolve, reject) => {
+            const server = http.createServer(app);
+            server.once('error', reject);
+            server.listen(0, '127.0.0.1', () => resolve(server));
+        });
+        servers.set(app, pending);
+    }
+    return pending;
+}
+
+// `redirect: 'manual'` matches supertest, which does not follow redirects —
+// otherwise a request to '/api-docs' would silently be reported as the 200
+// from '/api-docs/' rather than the 301. The body is always drained so undici
+// can release the socket, and is exposed as {} for non-JSON responses (the
+// swagger explorer serves HTML, and those scenarios assert only on status).
+async function get(path, headers) {
+    const server = await listen(getApp());
+    const { port } = server.address();
+    const res = await fetch(`http://127.0.0.1:${port}${path}`, {
+        headers,
+        redirect: 'manual',
+    });
+    const text = await res.text();
+    const isJson = (res.headers.get('content-type') || '').includes('application/json');
+    return {
+        status: res.status,
+        body: isJson && text ? JSON.parse(text) : {},
+    };
+}
+
+AfterAll(async function () {
+    await Promise.all([...servers.values()].map(async (pending) => {
+        const server = await pending;
+        // undici keeps connections alive, which would stall a plain close().
+        server.closeAllConnections();
+        await new Promise((resolve) => server.close(resolve));
+    }));
+    servers.clear();
+});
 
 // Resolve a dot-path (e.g. "meta.count") against an object.
 function getProp(obj, path) {
@@ -55,11 +104,11 @@ Given('the base path is {string}', function (basePath) {
 });
 
 When('I GET {string}', async function (path) {
-    this.response = await request(getApp()).get(path);
+    this.response = await get(path);
 });
 
 When('I GET {string} with api key {string}', async function (path, key) {
-    this.response = await request(getApp()).get(path).set('x-api-key', key);
+    this.response = await get(path, { 'x-api-key': key });
 });
 
 Then('the response status should be {int}', function (status) {

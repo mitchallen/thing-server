@@ -6,13 +6,23 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 10
     groups:
-      # Roll routine npm updates into a single PR to cut down on noise.
-      npm-dependencies:
-        patterns:
-          - "*"
+      # Production deps are what actually ships in the image, so their majors
+      # stay ungrouped and get reviewed one at a time. Minor/patch are routine.
+      prod-dependencies:
+        dependency-type: "production"
         update-types:
           - "minor"
           - "patch"
+
+      # Dev deps never reach the runtime image (the Dockerfile installs with
+      # --omit=dev), and CI gates every merge, so majors can ride along in the
+      # group rather than opening a PR each.
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+          - "major"
 
   - package-ecosystem: "docker"
     directory: "/"

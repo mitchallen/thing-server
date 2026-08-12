@@ -14,7 +14,9 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          # Keep in step with the Dockerfile's node:<major>-alpine stages, so
+          # CI exercises the runtime the image actually ships.
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
