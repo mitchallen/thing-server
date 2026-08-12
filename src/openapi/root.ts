@@ -1,7 +1,8 @@
-import { OpenApiFragment } from './types';
+import { OpenApiFragmentFactory } from './types';
 
-// Documents the service status route mounted at BASE_PATH.
-const rootFragment: OpenApiFragment = {
+// Documents the service status route mounted at BASE_PATH. The example echoes
+// the live label, path and count so it matches what the route actually returns.
+const rootFragment: OpenApiFragmentFactory = ({ path, label, list }) => ({
     paths: {
         '/': {
             get: {
@@ -22,9 +23,9 @@ const rootFragment: OpenApiFragment = {
                                         route: '/',
                                         explorer: '/api-docs',
                                         meta: {
-                                            label: 'things',
-                                            path: '/v1',
-                                            count: 3,
+                                            label,
+                                            path,
+                                            count: list.length,
                                         },
                                     },
                                 },
@@ -38,6 +39,6 @@ const rootFragment: OpenApiFragment = {
             },
         },
     },
-};
+});
 
 export default rootFragment;

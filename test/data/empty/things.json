@@ -1,0 +1,6 @@
+{
+    "label": "s",
+    "path": "/v4",
+    "//": "Two edge cases at once: an empty list, so the schema cannot be derived from a sample and falls back to an unconstrained object; and a label that is nothing but the plural 's', which leaves an empty string once the trailing 's' is stripped, so the schema name falls back to 'Item'.",
+    "list": []
+}

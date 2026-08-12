@@ -1,0 +1,28 @@
+{
+    "label": "inventory",
+    "path": "/v3",
+    "//": "Deliberately awkward data, to exercise the schema derivation in src/openapi/schema.ts. The label is not a plural, so no trailing s is stripped from the schema name. name is consistently a string; score mixes integer and float (widens to number); active is boolean; tags is an array; meta is an object; note is null in one entry and a string in the other (a lone null carries no type, so the string wins); blank is null in every entry, so no type can be inferred at all; mixed conflicts outright (string vs object, so no type is claimed); extra appears in only one entry.",
+    "list": [
+        {
+            "name": "first",
+            "score": 10,
+            "active": true,
+            "tags": ["a", "b"],
+            "meta": { "nested": 1 },
+            "note": null,
+            "blank": null,
+            "mixed": "text"
+        },
+        {
+            "name": "second",
+            "score": 2.5,
+            "active": false,
+            "tags": [],
+            "meta": {},
+            "note": "present",
+            "blank": null,
+            "mixed": { "shape": "object" },
+            "extra": "only here"
+        }
+    ]
+}

@@ -52,12 +52,19 @@ Run `gh issue list` for the current state. There are currently no open issues.
   major in a throwaway `git worktree`, never by installing into this checkout:
   `npm install` rewrites `package.json` + `package-lock.json`, and a later
   branch switch carries those onto the destination branch.
-- **OpenAPI:** the spec lives in `src/openapi/` as plain TS objects — one
-  fragment per route group (`root.ts`, `things.ts`), merged by `buildSpec()` in
-  `index.ts` and handed to `swagger-ui-express`. This replaced `swagger-jsdoc`,
-  which dragged in a whole OpenAPI validator (`ajv`, `js-yaml`, `fast-uri`) and
-  was a recurring source of Dependabot alerts. Don't reintroduce it — add new
-  route docs as a fragment in `src/openapi/` and register it in `fragments`.
+- **OpenAPI:** the spec lives in `src/openapi/`. Each fragment is a **function
+  of the live routes**, not a static object: `buildSpec(definition, routes)` in
+  `index.ts` calls every entry in `fragments` with the served `{ path, label,
+  list }` and merges the results for `swagger-ui-express`. So a data file
+  declaring path `/v2` and label `pets` documents `/v2/pets`, tags them `pets`,
+  and derives a `Pet` schema from the actual items (`schema.ts`) — the docs
+  cannot drift from the routes. **`routes.path` is the path *before* `BASE_PATH`
+  is applied**, since `BASE_PATH` is carried by the spec's `servers` entry;
+  passing the joined path would double-prefix every documented route.
+  This replaced `swagger-jsdoc`, which dragged in a whole OpenAPI validator
+  (`ajv`, `js-yaml`, `fast-uri`) and was a recurring source of Dependabot
+  alerts. Don't reintroduce it — add new route docs as a fragment in
+  `src/openapi/` and register it in `fragments`.
 - **Tests:** `npm test` (Cucumber, `features/`). `pretest` runs the build, and
   the steps import `createApp` from `dist/app` and drive it in-process, so tests
   exercise the same compiled artifact the image ships. Requests go through
