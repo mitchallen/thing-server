@@ -11,7 +11,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci
 
-# Copy sources and compile src/*.ts -> dist/, copying the *.yaml alongside
+# Copy sources and compile src/*.ts -> dist/
 COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build

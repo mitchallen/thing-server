@@ -2,8 +2,8 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import uptime from '@mitchallen/uptime';
-import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import { buildSpec } from './openapi';
 import * as staticListRouter from './static-list-router';
 
 const APP_VERSION = require("./../package").version;
@@ -47,32 +47,23 @@ export const createApp = () => {
         customSiteTitle: API_TITLE,
     };
 
-    const swaggerOptions = {
-        swaggerDefinition: {
-            openapi: '3.0.0',
-            servers: [
-                {
-                    url: BASE_PATH,     // e.g. "/api/service1"
-                    description: 'Mounted base path'
-                }
-            ],
-            info: {
-                title: API_TITLE,
-                version: APP_VERSION,
-                author: AUTHOR,
-                description: API_TAG_LINE,
-            },
-        },
-        // The yaml files are copied into dist/ by the build, alongside the
-        // compiled js; these paths are resolved against the process cwd.
-        apis: [
-            './dist/root.yaml',
-            './dist/things.yaml',
-            // put future route yaml here
+    // The route specs live in src/openapi/ and are compiled into dist/ with the
+    // rest of the app, so there is nothing to resolve against the process cwd.
+    const swaggerDocs = buildSpec({
+        openapi: '3.0.0',
+        servers: [
+            {
+                url: BASE_PATH,     // e.g. "/api/service1"
+                description: 'Mounted base path'
+            }
         ],
-    };
-
-    const swaggerDocs = swaggerJsdoc(swaggerOptions);
+        info: {
+            title: API_TITLE,
+            version: APP_VERSION,
+            author: AUTHOR,
+            description: API_TAG_LINE,
+        },
+    });
 
     const contents = fs.readFileSync(`${THINGSFILE}`);
     const thingsData: ThingsData = JSON.parse(contents.toString());
