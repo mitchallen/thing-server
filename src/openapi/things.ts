@@ -1,152 +1,131 @@
-import { OpenApiFragment } from './types';
+import { OpenApiFragmentFactory } from './types';
+import { schemaName, itemSchema, listExample } from './schema';
 
-// Documents the things routes served by static-list-router. The paths here are
-// the defaults ('/v1'); BASE_PATH is expressed through the spec's `servers`
-// entry rather than being baked into each path.
-const thingsFragment: OpenApiFragment = {
-    components: {
-        schemas: {
-            Thing: {
-                type: 'object',
-                description:
-                    'A thing. Objects in the list may have any properties; the default data set uses title and value.\n',
-                properties: {
-                    title: {
-                        type: 'string',
-                        description: "The thing's title",
-                    },
-                    value: {
-                        type: 'number',
-                        description: "The thing's value",
-                    },
-                },
-                example: {
-                    title: 'alpha',
-                    value: 100,
-                },
+// Documents the collection routes served by static-list-router. Every path and
+// name is derived from the live data file: a file declaring path '/v2' and
+// label 'pets' produces /v2, /v2/pets, /v2/pets/count and /v2/pets/{id}.
+// BASE_PATH is expressed through the spec's `servers` entry, not baked in here.
+const thingsFragment: OpenApiFragmentFactory = (routes) => {
+    const { path, label, list } = routes;
+    const name = schemaName(label);
+    const ref = `#/components/schemas/${name}`;
+
+    return {
+        components: {
+            schemas: {
+                [name]: itemSchema(routes),
             },
         },
-    },
-    paths: {
-        '/v1': {
-            get: {
-                summary: 'Get the things route status',
-                tags: ['things'],
-                responses: {
-                    200: {
-                        description: 'Things route status',
-                        content: {
-                            'application/json': {
-                                schema: {
-                                    type: 'object',
-                                    example: {
-                                        status: 'OK',
-                                        app: 'thing-server',
-                                        version: '1.0.0',
-                                        path: '/v1',
+        paths: {
+            [path]: {
+                get: {
+                    summary: `Get the ${label} route status`,
+                    tags: [label],
+                    responses: {
+                        200: {
+                            description: `${label} route status`,
+                            content: {
+                                'application/json': {
+                                    schema: {
+                                        type: 'object',
+                                        example: {
+                                            status: 'OK',
+                                            app: 'thing-server',
+                                            version: '1.0.0',
+                                            path,
+                                        },
                                     },
                                 },
                             },
                         },
-                    },
-                    500: {
-                        description: 'Internal server error',
+                        500: {
+                            description: 'Internal server error',
+                        },
                     },
                 },
             },
-        },
-        '/v1/things': {
-            get: {
-                summary: 'Get an array of things',
-                tags: ['things'],
-                responses: {
-                    200: {
-                        description: 'An array of things.',
-                        content: {
-                            'application/json': {
-                                schema: {
-                                    type: 'array',
-                                    items: {
-                                        $ref: '#/components/schemas/Thing',
+            [`${path}/${label}`]: {
+                get: {
+                    summary: `Get an array of ${label}`,
+                    tags: [label],
+                    responses: {
+                        200: {
+                            description: `An array of ${label}.`,
+                            content: {
+                                'application/json': {
+                                    schema: {
+                                        type: 'array',
+                                        items: { $ref: ref },
+                                        example: listExample(routes),
                                     },
-                                    example: [
-                                        { title: 'alpha', value: 100 },
-                                        { title: 'beta', value: 200 },
-                                        { title: 'gamma', value: 300 },
-                                    ],
                                 },
                             },
                         },
-                    },
-                    500: {
-                        description: 'Internal server error',
+                        500: {
+                            description: 'Internal server error',
+                        },
                     },
                 },
             },
-        },
-        '/v1/things/count': {
-            get: {
-                summary: 'Get the count of things',
-                tags: ['things'],
-                responses: {
-                    200: {
-                        description: 'The number of things.',
-                        content: {
-                            'application/json': {
-                                schema: {
-                                    type: 'object',
-                                    properties: {
-                                        count: { type: 'integer' },
+            [`${path}/${label}/count`]: {
+                get: {
+                    summary: `Get the count of ${label}`,
+                    tags: [label],
+                    responses: {
+                        200: {
+                            description: `The number of ${label}.`,
+                            content: {
+                                'application/json': {
+                                    schema: {
+                                        type: 'object',
+                                        properties: {
+                                            count: { type: 'integer' },
+                                        },
+                                        example: { count: list.length },
                                     },
-                                    example: { count: 3 },
                                 },
                             },
                         },
+                        500: {
+                            description: 'Internal server error',
+                        },
                     },
-                    500: {
-                        description: 'Internal server error',
+                },
+            },
+            [`${path}/${label}/{id}`]: {
+                get: {
+                    summary: `Get one of the ${label} by its 1-based id`,
+                    parameters: [
+                        {
+                            in: 'path',
+                            name: 'id',
+                            schema: { type: 'integer' },
+                            required: true,
+                            description: `1-based index of the entry in the ${label} list`,
+                        },
+                    ],
+                    tags: [label],
+                    responses: {
+                        200: {
+                            description: 'The entry at the given position.',
+                            content: {
+                                'application/json': {
+                                    schema: { $ref: ref },
+                                    example: list[0],
+                                },
+                            },
+                        },
+                        404: {
+                            description: 'id out of range',
+                        },
+                        500: {
+                            description: 'Internal server error',
+                        },
                     },
                 },
             },
         },
-        '/v1/things/{id}': {
-            get: {
-                summary: 'Get a thing by its 1-based id',
-                parameters: [
-                    {
-                        in: 'path',
-                        name: 'id',
-                        schema: { type: 'integer' },
-                        required: true,
-                        description: '1-based index of the thing in the list',
-                    },
-                ],
-                tags: ['things'],
-                responses: {
-                    200: {
-                        description: 'The thing at the given position.',
-                        content: {
-                            'application/json': {
-                                schema: {
-                                    $ref: '#/components/schemas/Thing',
-                                },
-                                example: {
-                                    title: 'alpha',
-                                    value: 100,
-                                },
-                            },
-                        },
-                    },
-                    404: {
-                        description: 'id out of range',
-                    },
-                    500: {
-                        description: 'Internal server error',
-                    },
-                },
-            },
-        },
-    },
+    };
 };
 
 export default thingsFragment;

@@ -47,8 +47,20 @@ export const createApp = () => {
         customSiteTitle: API_TITLE,
     };
 
+    const contents = fs.readFileSync(`${THINGSFILE}`);
+    const thingsData: ThingsData = JSON.parse(contents.toString());
+
+    const thingsLabel = thingsData.label || 'things';
+    const thingsList  = thingsData.list || [];
+    // Route path as declared by the data file, before BASE_PATH is applied.
+    // The spec needs this form, since BASE_PATH is carried by `servers`.
+    const thingsRoute = thingsData.path || '/v1';
+    const thingsPath  = joinUrlPath(BASE_PATH, thingsRoute);
+
     // The route specs live in src/openapi/ and are compiled into dist/ with the
     // rest of the app, so there is nothing to resolve against the process cwd.
+    // They are generated from the data file, so the documented paths, tags and
+    // examples match the routes actually mounted below.
     const swaggerDocs = buildSpec({
         openapi: '3.0.0',
         servers: [
@@ -63,14 +75,11 @@ export const createApp = () => {
             author: AUTHOR,
             description: API_TAG_LINE,
         },
+    }, {
+        path: thingsRoute,
+        label: thingsLabel,
+        list: thingsList,
     });
-
-    const contents = fs.readFileSync(`${THINGSFILE}`);
-    const thingsData: ThingsData = JSON.parse(contents.toString());
-
-    const thingsLabel = thingsData.label || 'things';
-    const thingsPath  = joinUrlPath(BASE_PATH, thingsData.path || '/v1');
-    const thingsList  = thingsData.list || [];
 
     const routerThings = staticListRouter.create({
         appName: APP_NAME,

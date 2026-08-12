@@ -58,6 +58,7 @@ async function get(path, headers) {
     return {
         status: res.status,
         body: isJson && text ? JSON.parse(text) : {},
+        text,
     };
 }
 
@@ -82,6 +83,7 @@ Before(function () {
     delete process.env.API_KEY;
     delete process.env.APP_NAME;
     delete process.env.BASE_PATH;
+    delete process.env.THINGSFILE;
     scenarioApp = null;
 });
 
@@ -103,12 +105,73 @@ Given('the base path is {string}', function (basePath) {
     scenarioApp = createApp();
 });
 
+Given('the things file is {string}', function (file) {
+    process.env.THINGSFILE = file;
+    scenarioApp = createApp();
+});
+
 When('I GET {string}', async function (path) {
     this.response = await get(path);
 });
 
 When('I GET {string} with api key {string}', async function (path, key) {
     this.response = await get(path, { 'x-api-key': key });
+});
+
+// swagger-ui-express embeds the generated spec in the init script it serves,
+// so this asserts against what the explorer actually renders rather than
+// reaching into the app object.
+When('I fetch the OpenAPI spec', async function () {
+    const res = await get('/api-docs/swagger-ui-init.js');
+    assert.strictEqual(res.status, 200, 'expected the swagger init script to be served');
+    const match = res.text.match(/"swaggerDoc":\s*(\{.*?\}),\s*"customOptions"/s);
+    assert.ok(match, 'could not find swaggerDoc in the swagger init script');
+    this.spec = JSON.parse(match[1]);
+});
+
+Then('the spec should document the path {string}', function (path) {
+    assert.ok(
+        Object.prototype.hasOwnProperty.call(this.spec.paths, path),
+        `expected the spec to document ${path}, got: ${Object.keys(this.spec.paths).join(', ')}`,
+    );
+});
+
+Then('the spec should not document the path {string}', function (path) {
+    assert.ok(
+        !Object.prototype.hasOwnProperty.call(this.spec.paths, path),
+        `expected the spec not to document ${path}`,
+    );
+});
+
+Then('the spec should define the schema {string}', function (name) {
+    const schemas = this.spec.components.schemas;
+    assert.ok(
+        Object.prototype.hasOwnProperty.call(schemas, name),
+        `expected schema ${name}, got: ${Object.keys(schemas).join(', ')}`,
+    );
+});
+
+Then('the spec schema {string} should describe the property {string} as {string}',
+    function (name, prop, type) {
+        const schema = this.spec.components.schemas[name];
+        assert.ok(schema, `no schema named ${name}`);
+        assert.deepStrictEqual(getProp(schema, `properties.${prop}`), { type });
+    });
+
+// A property whose entries disagree (or that is only ever null) gets an empty
+// schema — OpenAPI's "any" — rather than a type some entries would violate.
+Then('the spec schema {string} should claim no type for the property {string}',
+    function (name, prop) {
+        const schema = this.spec.components.schemas[name];
+        assert.ok(schema, `no schema named ${name}`);
+        assert.deepStrictEqual(getProp(schema, `properties.${prop}`), {});
+    });
+
+Then('the spec schema {string} should have no properties', function (name) {
+    const schema = this.spec.components.schemas[name];
+    assert.ok(schema, `no schema named ${name}`);
+    assert.strictEqual(schema.properties, undefined);
+    assert.strictEqual(schema.type, 'object');
 });
 
 Then('the response status should be {int}', function (status) {
