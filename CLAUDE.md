@@ -38,6 +38,13 @@ Run `gh issue list` for the current state. There are currently no open issues.
   dozen lines was not worth a package. Prefer vendoring or the Node stdlib over
   adding a dependency; this repo has a history of Dependabot churn from
   transitive trees far larger than the code they served.
+- **Dependabot:** `.github/dependabot.yml` groups minor/patch by
+  `dependency-type`, prod and dev separately. **Majors are never grouped** — in
+  either scope. "Development" includes the TypeScript compiler, and a compiler
+  major changes what the build enforces and emits, so it gets its own PR. Vet a
+  major in a throwaway `git worktree`, never by installing into this checkout:
+  `npm install` rewrites `package.json` + `package-lock.json`, and a later
+  branch switch carries those onto the destination branch.
 - **OpenAPI:** the spec lives in `src/openapi/` as plain TS objects — one
   fragment per route group (`root.ts`, `things.ts`), merged by `buildSpec()` in
   `index.ts` and handed to `swagger-ui-express`. This replaced `swagger-jsdoc`,

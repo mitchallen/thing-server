@@ -15,14 +15,16 @@ updates:
           - "patch"
 
       # Dev deps never reach the runtime image (the Dockerfile installs with
-      # --omit=dev), and CI gates every merge, so majors can ride along in the
-      # group rather than opening a PR each.
+      # --omit=dev), so their minor/patch churn is grouped too. Majors are
+      # NOT grouped: "development" includes the TypeScript compiler, and a
+      # compiler major changes what the build enforces and what it emits. TS 6
+      # silently flipped `strict` on by default and broke the build (#69); that
+      # deserves its own PR, not a line item in a three-package bump (#74).
       dev-dependencies:
         dependency-type: "development"
         update-types:
           - "minor"
           - "patch"
-          - "major"
 
   - package-ecosystem: "docker"
     directory: "/"
