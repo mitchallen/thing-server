@@ -32,6 +32,13 @@ Run `gh issue list` for the current state. There are currently no open issues.
   compiler bump. `strict`, `module`, `target` and `rootDir` are all pinned here
   for that reason. Under `strict`, an untyped JS dependency fails the build with
   TS7016 — either vendor it (see `src/uptime.ts`) or add a `src/types/*.d.ts`.
+- **TypeScript 7 is the native Go port.** `tsc` is a prebuilt binary pulled in
+  per-platform via optionalDependencies, not JS. Two consequences: it is
+  **statically linked with no `libc` constraint**, so it works in the
+  `node:24-alpine` builder stage (musl) — verified, not assumed; and 7.0 ships
+  **without a compiler API** until 7.1, so typescript-eslint, webpack loaders
+  and Volar-based tooling cannot consume it. None are used here; don't add one
+  and expect it to work.
 - **Runtime deps are deliberately minimal:** `express`, `cors` and
   `swagger-ui-express`, nothing else. `src/uptime.ts` is vendored from
   `@mitchallen/uptime` 0.0.8 (MIT, same author) rather than depended on — a

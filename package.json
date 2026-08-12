@@ -42,7 +42,7 @@
     "@types/node": "^26.2.0",
     "@types/swagger-ui-express": "^4.1.8",
     "c8": "^12.0.0",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   },
   "c8": {
     "include": [
