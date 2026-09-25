@@ -30,6 +30,9 @@
   },
   "author": "Mitch Allen <npm@mitchallen.com> (http://mitchallen.com)",
   "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.2.1",
