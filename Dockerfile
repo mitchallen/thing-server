@@ -2,7 +2,7 @@
 # docker run -p 1234:3000 -d <your username>/thing-server
 
 # --- Stage 1: Build ---
-FROM node:24-alpine AS builder
+FROM node:25-alpine AS builder
 WORKDIR /usr/src/app
 
 # Copy package files first for better caching, then install ALL dependencies
@@ -17,7 +17,7 @@ COPY src ./src
 RUN npm run build
 
 # --- Stage 2: Production ---
-FROM node:24-alpine AS prod
+FROM node:25-alpine AS prod
 WORKDIR /usr/src/app
 
 # Upgrade OS packages to fix vulnerabilities.
