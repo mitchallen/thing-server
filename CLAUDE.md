@@ -52,8 +52,8 @@ Run `gh issue list` for the current state. There are currently no open issues.
   major in a throwaway `git worktree`, never by installing into this checkout:
   `npm install` rewrites `package.json` + `package-lock.json`, and a later
   branch switch carries those onto the destination branch.
-  Version updates run **monthly** (npm and docker) to cut PR noise; security
-  updates ignore the schedule and still open immediately. `@types/node`
+  Version updates run **monthly** (npm, docker and github-actions) to cut PR
+  noise; security updates ignore the schedule and still open immediately. `@types/node`
   minor/patch bumps are ignored — only its majors come through. The docker
   `node` image ignores odd (non-LTS) majors by explicit range; extend the
   list before Node 33.
