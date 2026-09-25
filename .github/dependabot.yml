@@ -2,9 +2,19 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/"
+    # Monthly: security updates bypass the schedule and still open as soon as
+    # an alert fires, so this only slows routine version bumps.
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 10
+    # @types/node minor/patch bumps were most of the weekly PR noise and
+    # rarely matter here. Majors still come through, and track the Node
+    # major the image runs on.
+    ignore:
+      - dependency-name: "@types/node"
+        update-types:
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"
     groups:
       # Production deps are what actually ships in the image, so their majors
       # stay ungrouped and get reviewed one at a time. Minor/patch are routine.
@@ -29,4 +39,4 @@ updates:
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"

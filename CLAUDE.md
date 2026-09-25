@@ -52,6 +52,9 @@ Run `gh issue list` for the current state. There are currently no open issues.
   major in a throwaway `git worktree`, never by installing into this checkout:
   `npm install` rewrites `package.json` + `package-lock.json`, and a later
   branch switch carries those onto the destination branch.
+  Version updates run **monthly** (npm and docker) to cut PR noise; security
+  updates ignore the schedule and still open immediately. `@types/node`
+  minor/patch bumps are ignored — only its majors come through.
 - **OpenAPI:** the spec lives in `src/openapi/`. Each fragment is a **function
   of the live routes**, not a static object: `buildSpec(definition, routes)` in
   `index.ts` calls every entry in `fragments` with the served `{ path, label,
