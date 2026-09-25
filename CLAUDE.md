@@ -84,7 +84,9 @@ Run `gh issue list` for the current state. There are currently no open issues.
   enforced at **100%** on all four measures (`check-coverage` + `100` in the
   `c8` block of `package.json`), so new code needs a scenario. Code JSON
   input cannot reach may take a `/* c8 ignore next */` with a comment saying
-  why — not as a shortcut for testable branches.
+  why — not as a shortcut for testable branches. The README's coverage badge
+  is a static `100%` backed by that threshold (a red `test` badge beside it
+  means it failed); if the threshold ever changes, change the badge with it.
   The swagger explorer uses `swaggerUi.serveFiles(doc)`, not `swaggerUi.serve`:
   `serve` keeps the init script in module-level state, so with several apps in
   one process (as the tests build) every app served the last-built spec. `c8` is the

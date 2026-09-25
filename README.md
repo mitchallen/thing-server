@@ -1,6 +1,6 @@
 # thing-server
 
-[![GitHub tag](https://img.shields.io/github/v/tag/mitchallen/thing-server?sort=semver&label=version)](https://github.com/mitchallen/thing-server/tags) [![Docker Hub](https://img.shields.io/docker/v/mitchallen/thing-server?sort=semver&label=docker%20hub)](https://hub.docker.com/r/mitchallen/thing-server)
+[![GitHub tag](https://img.shields.io/github/v/tag/mitchallen/thing-server?sort=semver&label=version)](https://github.com/mitchallen/thing-server/tags) [![Docker Hub](https://img.shields.io/docker/v/mitchallen/thing-server?sort=semver&label=docker%20hub)](https://hub.docker.com/r/mitchallen/thing-server) [![test](https://github.com/mitchallen/thing-server/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/mitchallen/thing-server/actions/workflows/test.yml) [![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/mitchallen/thing-server/actions/workflows/test.yml)
 
 A simple REST API server for returning JSON things.
 
