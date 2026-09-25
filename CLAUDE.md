@@ -54,7 +54,9 @@ Run `gh issue list` for the current state. There are currently no open issues.
   branch switch carries those onto the destination branch.
   Version updates run **monthly** (npm and docker) to cut PR noise; security
   updates ignore the schedule and still open immediately. `@types/node`
-  minor/patch bumps are ignored — only its majors come through.
+  minor/patch bumps are ignored — only its majors come through. The docker
+  `node` image ignores odd (non-LTS) majors by explicit range; extend the
+  list before Node 33.
 - **OpenAPI:** the spec lives in `src/openapi/`. Each fragment is a **function
   of the live routes**, not a static object: `buildSpec(definition, routes)` in
   `index.ts` calls every entry in `fragments` with the served `{ path, label,

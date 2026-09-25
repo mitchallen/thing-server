@@ -40,3 +40,15 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    # The image tracks Node LTS lines only (the node:<major>-alpine stages in
+    # the Dockerfile). Odd majors never become LTS and are EOL within months,
+    # so skip them; even majors (26, 28, ...) still come through as their own
+    # PR. Dependabot has no "odd majors" matcher, so each is listed — extend
+    # this before 33 ships.
+    ignore:
+      - dependency-name: "node"
+        versions:
+          - ">= 25, < 26"
+          - ">= 27, < 28"
+          - ">= 29, < 30"
+          - ">= 31, < 32"
