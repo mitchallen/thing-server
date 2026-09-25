@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           # Keep in step with the Dockerfile's node:<major>-alpine stages, so
           # CI exercises the runtime the image actually ships.
