@@ -1,6 +1,6 @@
 {
   "name": "thing-server",
-  "version": "1.0.28",
+  "version": "1.0.29",
   "private": true,
   "description": "A simple REST API server for returning JSON things",
   "main": "dist/index.js",
@@ -48,8 +48,8 @@
     "typescript": "^7.0.2"
   },
   "c8": {
-    "check-coverage": true,
     "100": true,
+    "check-coverage": true,
     "include": [
       "dist/**/*.js"
     ],
