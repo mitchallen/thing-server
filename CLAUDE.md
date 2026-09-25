@@ -76,7 +76,11 @@ Run `gh issue list` for the current state. There are currently no open issues.
   A shared default app is reused; scenarios that set `APP_NAME`/`BASE_PATH` get
   their own instance, each with its own listener closed in `AfterAll`.
   Step definitions stay plain JS.
-  CI (`.github/workflows/test.yml`) runs on push/PR to `main`.
+  CI (`.github/workflows/test.yml`) runs on push/PR to `main`, as
+  `npm run test-coverage` — `c8` wrapping `cucumber-js` — with the table in the
+  job summary and the report uploaded as the `coverage` artifact. `c8` is the
+  Cucumber coverage tool; don't drop it to cut Dependabot noise (Node's
+  built-in coverage only works with `node:test`).
 - **Release:** bump the version and push a `v*` tag → the publish workflows build
   and push multi-platform images to GHCR + Docker Hub and sync the README to
   Docker Hub. See the README "Publish" section.
