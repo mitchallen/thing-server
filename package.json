@@ -11,8 +11,6 @@
     "start:pets": "THINGSFILE=./test/data/pets/things.json node dist/index.js",
     "pretest": "npm run build",
     "test": "cucumber-js",
-    "pretest-coverage": "npm run build",
-    "test-coverage": "c8 --reporter=text --reporter=lcov cucumber-js",
     "docker:build": "docker build -t mitchallen/thing-server .",
     "docker:run": "docker run -d -p 1234:3000 --name thing-server mitchallen/thing-server",
     "test:pets": "docker run -p 8100:3000 -v ${PWD}/test/data/pets:/usr/src/app/data --name pet-things mitchallen/thing-server",
@@ -44,20 +42,6 @@
     "@types/express": "^5.0.6",
     "@types/node": "^26.5.1",
     "@types/swagger-ui-express": "^4.1.8",
-    "c8": "^12.0.0",
     "typescript": "^7.0.2"
-  },
-  "c8": {
-    "include": [
-      "dist/**/*.js"
-    ],
-    "exclude": [
-      "features/**",
-      "dist/**/*.js.map"
-    ],
-    "reporter": [
-      "text",
-      "lcov"
-    ]
   }
 }
