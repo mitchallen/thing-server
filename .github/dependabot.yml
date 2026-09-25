@@ -52,3 +52,10 @@ updates:
           - ">= 27, < 28"
           - ">= 29, < 30"
           - ">= 31, < 32"
+
+  # Keeps the workflows' actions (checkout, setup-node, upload-artifact, the
+  # docker/* publish actions) current. Monthly, like the other ecosystems.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
