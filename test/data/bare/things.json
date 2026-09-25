@@ -1,0 +1,3 @@
+{
+    "//": "Declares nothing but this comment, so createApp() falls back on every default: label 'things', path '/v1' and an empty list."
+}

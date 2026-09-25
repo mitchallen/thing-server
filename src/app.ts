@@ -103,10 +103,12 @@ export const createApp = () => {
 
     app.use(cors());
 
-    // Setup swagger explorer
+    // Setup swagger explorer. serveFiles, not serve: `serve` reads the init
+    // script from module-level state that the last setup() call overwrites,
+    // so every app in the process would serve whichever spec was built last.
     app.use(
         EXPLORER_PATH,
-        swaggerUi.serve,
+        swaggerUi.serveFiles(swaggerDocs, customSwaggerOptions),
         swaggerUi.setup(swaggerDocs, customSwaggerOptions)
     );
 

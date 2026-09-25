@@ -274,7 +274,7 @@ npm test               # build, then run the Cucumber suite
 npm run test-coverage  # same suite under c8; text table + coverage/lcov-report/index.html
 ```
 
-CI runs `test-coverage` on every push and PR to `main`, writes the coverage table to the job summary, and uploads the HTML/lcov report as the `coverage` artifact.
+Coverage must stay at **100%** (statements, branches, functions and lines); `test-coverage` fails below that. CI runs `test-coverage` on every push and PR to `main`, writes the coverage table to the job summary, and uploads the HTML/lcov report as the `coverage` artifact.
 
 * * *
 
