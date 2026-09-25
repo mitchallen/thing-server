@@ -30,6 +30,9 @@ const typeOf = (value: unknown): { type?: string } => {
         case 'boolean': return { type: 'boolean' };
         case 'number':  return { type: Number.isInteger(value) ? 'integer' : 'number' };
         case 'object':  return { type: 'object' };
+        // Unreachable from JSON.parse output (only string, number, boolean,
+        // object, and null/array handled above); kept so the switch is total.
+        /* c8 ignore next */
         default:        return {};
     }
 };

@@ -1,0 +1,8 @@
+{
+    "label": "widgets",
+    "path": "v5",
+    "//": "The path has no leading slash; joinUrlPath adds one, so the routes still mount at /v5.",
+    "list": [
+        { "name": "sprocket" }
+    ]
+}

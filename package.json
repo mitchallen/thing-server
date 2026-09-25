@@ -48,6 +48,8 @@
     "typescript": "^7.0.2"
   },
   "c8": {
+    "check-coverage": true,
+    "100": true,
     "include": [
       "dist/**/*.js"
     ],

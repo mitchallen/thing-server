@@ -80,7 +80,14 @@ Run `gh issue list` for the current state. There are currently no open issues.
   Step definitions stay plain JS.
   CI (`.github/workflows/test.yml`) runs on push/PR to `main`, as
   `npm run test-coverage` — `c8` wrapping `cucumber-js` — with the table in the
-  job summary and the report uploaded as the `coverage` artifact. `c8` is the
+  job summary and the report uploaded as the `coverage` artifact. Coverage is
+  enforced at **100%** on all four measures (`check-coverage` + `100` in the
+  `c8` block of `package.json`), so new code needs a scenario. Code JSON
+  input cannot reach may take a `/* c8 ignore next */` with a comment saying
+  why — not as a shortcut for testable branches.
+  The swagger explorer uses `swaggerUi.serveFiles(doc)`, not `swaggerUi.serve`:
+  `serve` keeps the init script in module-level state, so with several apps in
+  one process (as the tests build) every app served the last-built spec. `c8` is the
   Cucumber coverage tool; don't drop it to cut Dependabot noise (Node's
   built-in coverage only works with `node:test`).
 - **Release:** bump the version and push a `v*` tag → the publish workflows build
