@@ -61,5 +61,8 @@
       "text",
       "lcov"
     ]
+  },
+  "allowScripts": {
+    "@scarf/scarf": false
   }
 }
