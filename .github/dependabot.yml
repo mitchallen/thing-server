@@ -1,4 +1,7 @@
 version: 2
+# Noise control: `cooldown` skips releases younger than 7 days, so a burst of
+# quick patch releases lands as one bump to the latest instead of a PR each.
+# Cooldown does not delay security updates.
 updates:
   - package-ecosystem: "npm"
     directory: "/"
@@ -6,6 +9,8 @@ updates:
     # an alert fires, so this only slows routine version bumps.
     schedule:
       interval: "monthly"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     # @types/node minor/patch bumps were most of the weekly PR noise and
     # rarely matter here. Majors still come through, and track the Node
@@ -40,6 +45,8 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    cooldown:
+      default-days: 7
     # The image tracks Node LTS lines only (the node:<major>-alpine stages in
     # the Dockerfile). Odd majors never become LTS and are EOL within months,
     # so skip them; even majors (26, 28, ...) still come through as their own
@@ -59,3 +66,8 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    cooldown:
+      default-days: 7
+    groups:
+      actions-minor-patch:
+        update-types: ["minor", "patch"]
