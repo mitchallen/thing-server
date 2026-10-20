@@ -95,5 +95,10 @@ Run `gh issue list` for the current state. There are currently no open issues.
 - **Release:** bump the version and push a `v*` tag → the publish workflows build
   and push multi-platform images to GHCR + Docker Hub and sync the README to
   Docker Hub. See the README "Publish" section.
+- **PR CI builds and smoke-tests the image** (the `docker` job in
+  `.github/workflows/test.yml`), but only for the runner's platform — the
+  `linux/arm64` half of the multi-platform build only runs at release. Its
+  checks assert on the bundled `data/things.json` (`count` 3, item 1 `alpha`),
+  so update them if that file changes.
 - **Keep Express 5** — thing-server is intentionally ahead of random-server here.
 - Default branch is `main`. Work on a branch and open a PR (CI gates merges).
