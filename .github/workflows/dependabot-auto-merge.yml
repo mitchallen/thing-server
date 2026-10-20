@@ -1,0 +1,46 @@
+name: dependabot-auto-merge
+# Auto-merges low-risk Dependabot PRs once the required CI checks pass.
+# Native auto-merge waits for the branch-protection checks on main (test +
+# docker), so a bump only lands if the workflows still go green. Scope:
+#   - github-actions: all updates (CI-only, low blast radius).
+#   - npm / docker:   minor + patch only — major bumps stay manual for review.
+#
+# Majors are excluded on purpose, and recent history shows why: TS 6 silently
+# flipped `strict` on and broke this repo's build (#69), and in sibling
+# random-server the TypeScript 7.0 bump broke the build (TS7016) and the
+# Node 24 -> 25 base image was declined as non-LTS. All needed a human.
+#
+# Merges with --squash to match this repo's history (PRs land as "title (#N)").
+#
+# NB: package-ecosystem is Dependabot's internal identifier, not the friendly
+# name from dependabot.yml — npm reports as `npm_and_yarn` and Actions as
+# `github_actions` (they match the dependabot/<ecosystem>/ branch prefix). A
+# literal `== 'npm'` would silently never match, which is exactly the trap the
+# sibling random-mcp-server repo fell into: it tests `== 'pip'` while the real
+# output there is `uv`, so its Python bumps never auto-merge. Hence startsWith.
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v3
+
+      - name: Enable auto-merge for in-scope updates
+        if: >-
+          startsWith(steps.metadata.outputs.package-ecosystem, 'github')
+          || ( (steps.metadata.outputs.package-ecosystem == 'docker'
+          || startsWith(steps.metadata.outputs.package-ecosystem, 'npm'))
+          && (steps.metadata.outputs.update-type == 'version-update:semver-minor'
+          || steps.metadata.outputs.update-type == 'version-update:semver-patch') )
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
