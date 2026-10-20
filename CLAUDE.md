@@ -100,5 +100,12 @@ Run `gh issue list` for the current state. There are currently no open issues.
   `linux/arm64` half of the multi-platform build only runs at release. Its
   checks assert on the bundled `data/things.json` (`count` 3, item 1 `alpha`),
   so update them if that file changes.
+- **Branch protection:** `main` requires the `test` and `docker` checks.
+  `enforce_admins` is off, so direct version-bump pushes to `main` still work.
+- **Low-risk Dependabot PRs auto-merge** via
+  `.github/workflows/dependabot-auto-merge.yml` (squash): all github-actions
+  updates, plus npm/docker **minor and patch**. Majors always stay manual.
+  This relies on the required checks above — native auto-merge waits for
+  them, and without them it would land PRs with no CI gating.
 - **Keep Express 5** — thing-server is intentionally ahead of random-server here.
 - Default branch is `main`. Work on a branch and open a PR (CI gates merges).
