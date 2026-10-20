@@ -16,8 +16,9 @@ name: dependabot-auto-merge
 # name from dependabot.yml — npm reports as `npm_and_yarn` and Actions as
 # `github_actions` (they match the dependabot/<ecosystem>/ branch prefix). A
 # literal `== 'npm'` would silently never match, which is exactly the trap the
-# sibling random-mcp-server repo fell into: it tests `== 'pip'` while the real
-# output there is `uv`, so its Python bumps never auto-merge. Hence startsWith.
+# sibling random-mcp-server repo fell into: it tested `== 'pip'` while the real
+# output there is `uv`, so its Python bumps never auto-merged (since fixed
+# to match `uv`). Hence startsWith.
 on: pull_request
 
 permissions:
