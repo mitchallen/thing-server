@@ -94,18 +94,44 @@ Run `gh issue list` for the current state. There are currently no open issues.
   built-in coverage only works with `node:test`).
 - **Release:** bump the version and push a `v*` tag → the publish workflows build
   and push multi-platform images to GHCR + Docker Hub and sync the README to
-  Docker Hub. See the README "Publish" section.
+  Docker Hub. See the README "Publish" section. In practice:
+  `npm version X.Y.Z -m "X.Y.Z"` on a clean, up-to-date `main`, then
+  `git push origin main` and `git push origin vX.Y.Z` (expect a "Bypassed rule
+  violations" notice on the `main` push — admins aren't held to the required
+  checks). Both publish workflows take ~1.5 min. Patch bump for a dependency
+  update (1.0.32 = Express 5.3.0).
+- **Deciding whether a release is due:** compare `main` against the latest tag
+  and ignore `.github/` and `*.md` — CI and docs changes don't reach the image.
+  A lockfile change only counts if it moves the *production* tree; compare the
+  non-dev entries (`jq '.packages|to_entries[]|select(.value.dev!=true)'` on
+  `package-lock.json` at the tag vs now). Dependabot auto-merges land on `main`
+  without a release, so a production bump sits unshipped until someone tags it.
 - **PR CI builds and smoke-tests the image** (the `docker` job in
   `.github/workflows/test.yml`), but only for the runner's platform — the
   `linux/arm64` half of the multi-platform build only runs at release. Its
   checks assert on the bundled `data/things.json` (`count` 3, item 1 `alpha`),
   so update them if that file changes.
-- **Branch protection:** `main` requires the `test` and `docker` checks.
-  `enforce_admins` is off, so direct version-bump pushes to `main` still work.
+- **Branch protection:** `main` requires the `test` and `docker` checks
+  (set up 2026-10-20, matching random-server). `enforce_admins` is off, so
+  direct version-bump pushes to `main` still work. Merge PRs with `--squash`
+  — the history reads `title (#N)`.
 - **Low-risk Dependabot PRs auto-merge** via
   `.github/workflows/dependabot-auto-merge.yml` (squash): all github-actions
   updates, plus npm/docker **minor and patch**. Majors always stay manual.
   This relies on the required checks above — native auto-merge waits for
-  them, and without them it would land PRs with no CI gating.
-- **Keep Express 5** — thing-server is intentionally ahead of random-server here.
+  them, and without them it would land PRs with no CI gating. Added
+  2026-10-20 and not yet exercised: on the first monthly Dependabot PR, check
+  that the `auto-merge` job ran and the PR merged only after `test` + `docker`
+  passed. Merges made by the workflow's `GITHUB_TOKEN` don't start a `push`
+  run of `test.yml` on `main`; the PR's checks are the gate.
+- **Express 5 everywhere now.** thing-server moved first; random-server caught
+  up in 2.2.0. Because this repo's Dependabot runs **monthly** and
+  random-server's weekly, bumps reach random-server first — when it ships a
+  production dependency, run `npm outdated` here rather than waiting a month
+  (Express 5.3.0 was hand-bumped in #102 the day random-server released it).
+- **Node 26:** the image and CI are on Node 24. Node 26 enters LTS on
+  **2026-10-28**; after that, move both `Dockerfile` stages *and*
+  `test.yml`'s `node-version` together (the comment there says why), as
+  random-server did. Dependabot's docker ignore list skips odd majors only, so
+  expect it to propose 26 as its own PR.
 - Default branch is `main`. Work on a branch and open a PR (CI gates merges).
