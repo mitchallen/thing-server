@@ -42,3 +42,48 @@ jobs:
           name: coverage
           path: coverage/
           retention-days: 14
+
+  # The publish workflows only run on `v*` tags, so without this job a broken
+  # Dockerfile or build script would not surface until release time. Builds the
+  # image and smoke-tests the container; never pushes.
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build the Docker image
+        run: docker build -t thing-server:ci .
+
+      - name: Smoke test the container
+        run: |
+          set -euo pipefail
+          docker run -d --name ts-ci -p 3000:3000 thing-server:ci
+
+          # Wait for the server to accept connections, failing loudly if it
+          # never does (a crash-looping container would otherwise just hang).
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/ >/dev/null; then break; fi
+            if [ "$i" = "30" ]; then
+              echo "container never became ready; logs:" >&2
+              docker logs ts-ci >&2
+              exit 1
+            fi
+            sleep 1
+          done
+
+          # Exercises the bundled data/things.json, which only the image ships.
+          curl -sf http://localhost:3000/ | grep -q '"status":"OK"'
+          curl -sf http://localhost:3000/v1/things/count | grep -q '"count":3'
+          curl -sf http://localhost:3000/v1/things/1 | grep -q '"title":"alpha"'
+
+          # Assert on strings from the route docs in src/openapi/, not just
+          # "openapi", so the check fails if the paths/schemas go missing.
+          curl -sf http://localhost:3000/api-docs/swagger-ui-init.js > spec.js
+          grep -q 'Get the service status' spec.js
+          grep -q 'Get the count of things' spec.js
+          grep -q '#/components/schemas/' spec.js
+          echo "container smoke test passed"
+
+      - name: Container logs
+        if: always()
+        run: docker logs ts-ci || true
