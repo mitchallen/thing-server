@@ -1,0 +1,33 @@
+name: scan-scheduled
+# Re-scan the ALREADY-PUBLISHED image on a schedule. A clean image today can
+# become vulnerable tomorrow when a new CVE is disclosed against a package
+# baked into it — e.g. a Node.js security release against the node:*-alpine
+# base. Nothing else re-checks an image after it ships; this does, and files
+# the findings in the Security tab (Code scanning, category trivy-scheduled).
+on:
+  schedule:
+    - cron: '17 6 * * *' # daily at 06:17 UTC
+  workflow_dispatch: {}
+
+jobs:
+  scan-published:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Trivy scan of published :latest (SARIF)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ghcr.io/mitchallen/thing-serveratest
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH,MEDIUM
+          ignore-unfixed: false
+
+      - name: Upload SARIF to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-scheduled
