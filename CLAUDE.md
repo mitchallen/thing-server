@@ -105,7 +105,8 @@ Run `gh issue list` for the current state. There are currently no open issues.
   A lockfile change only counts if it moves the *production* tree; compare the
   non-dev entries (`jq '.packages|to_entries[]|select(.value.dev!=true)'` on
   `package-lock.json` at the tag vs now). Dependabot auto-merges land on `main`
-  without a release, so a production bump sits unshipped until someone tags it.
+  without a release, so a production bump sits unshipped until someone tags it. `auto-release.yml`
+  now does that weekly (see "Automated releases").
 - **PR CI builds and smoke-tests the image** (the `docker` job in
   `.github/workflows/test.yml`), but only for the runner's platform — the
   `linux/arm64` half of the multi-platform build only runs at release. Its
@@ -135,3 +136,27 @@ Run `gh issue list` for the current state. There are currently no open issues.
   random-server did. Dependabot's docker ignore list skips odd majors only, so
   expect it to propose 26 as its own PR.
 - Default branch is `main`. Work on a branch and open a PR (CI gates merges).
+
+## Automated releases
+
+`.github/workflows/auto-release.yml` ships Dependabot updates without a
+hand-cut release. Every Wednesday at 15:00 UTC it runs
+`.github/scripts/auto-release.sh plan`. A release is due when `main` has
+changes since the latest tag that reach the image, and every one was committed
+by a bot. CI, docs and test changes and dev-only dependency bumps don't count.
+When a release is due, it opens an `auto-release/vX.Y.Z` PR (patch version bump) with
+auto-merge (squash) on, so it lands only once the required checks pass. When the
+PR merges, the `tag` job tags the merge commit, and the tag push triggers the
+publish workflows. It also creates the GitHub Release.
+
+- **Anything a person changed is left alone.** A human commit touching
+  image-affecting files, or entries under `[Unreleased]` in the changelog,
+  makes `plan` skip with a reason in the run summary. Release those with
+  the manual tag flow above.
+- **Run it by hand:** `gh workflow run auto-release.yml -f dry-run=true`
+  reports the decision without opening a PR; drop `dry-run` to release now.
+- **Credentials:** pushes use a GitHub App token (repo variable
+  `RELEASE_APP_CLIENT_ID`, secret `RELEASE_APP_PRIVATE_KEY`), because tags and
+  PRs created with `GITHUB_TOKEN` don't trigger other workflows.
+- **Keep it in sync.** The same script and workflow live in all eight sibling
+  repos; only the `MERGE_METHOD` and `CREATE_RELEASE` env values differ.
