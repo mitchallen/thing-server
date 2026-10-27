@@ -1,0 +1,138 @@
+name: auto-release
+# Weekly batch release of bot-merged dependency updates.
+#
+# Every Wednesday, after Monday's Dependabot run has had time to auto-merge,
+# .github/scripts/auto-release.sh checks whether main has changes since the
+# latest tag that reach the published image and were all made by bots. If so,
+# it opens an auto-release/vX.Y.Z PR with the patch bump and CHANGELOG section
+# and turns on auto-merge, so the release lands only once the required checks
+# pass. When that PR merges, the `tag` job tags the merge commit and creates
+# the GitHub Release; the tag push triggers the publish workflows.
+#
+# Changes made by a person, or [Unreleased] CHANGELOG entries, are left for a
+# hand-cut release. Run it from the Actions tab at any time;
+# dry-run reports the decision without opening a PR.
+#
+# Pushes use a GitHub App token, not GITHUB_TOKEN: events made with
+# GITHUB_TOKEN don't trigger other workflows, so its tag would publish nothing
+# and its PR would never get the required checks. Needs the repo variable
+# RELEASE_APP_CLIENT_ID and secret RELEASE_APP_PRIVATE_KEY.
+on:
+  schedule:
+    - cron: "0 15 * * 3" # Wednesdays 15:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Report whether a release is due without opening a PR
+        type: boolean
+        default: false
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: auto-release
+  cancel-in-progress: false
+
+env:
+  MERGE_METHOD: squash # matches dependabot-auto-merge.yml
+  CREATE_RELEASE: true # the tag job creates the GitHub Release
+
+jobs:
+  open-pr:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub App token
+        id: app
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          token: ${{ steps.app.outputs.token }}
+
+      - uses: astral-sh/setup-uv@v7
+        if: hashFiles('uv.lock') != ''
+
+      - name: Decide whether a release is due
+        id: plan
+        run: .github/scripts/auto-release.sh plan
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+
+      - name: Summarize
+        run: echo "$REASON" >> "$GITHUB_STEP_SUMMARY"
+        env:
+          REASON: ${{ steps.plan.outputs.reason }}
+
+      - name: Open the release PR
+        if: steps.plan.outputs.due == 'true' && !inputs.dry-run
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          APP_SLUG: ${{ steps.app.outputs.app-slug }}
+          VERSION: ${{ steps.plan.outputs.version }}
+        run: |
+          branch="auto-release/v$VERSION"
+          user_id=$(gh api "/users/${APP_SLUG}%5Bbot%5D" --jq .id)
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "$user_id+${APP_SLUG}[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          .github/scripts/auto-release.sh prepare
+          .github/scripts/auto-release.sh notes > "$RUNNER_TEMP/notes.md"
+          git commit -am "Release v$VERSION"
+          git push origin "$branch"
+          url=$(gh pr create --base main --head "$branch" \
+            --title "Release v$VERSION" --body-file "$RUNNER_TEMP/notes.md")
+          gh pr merge "$url" --auto "--$MERGE_METHOD"
+          echo "Opened $url" >> "$GITHUB_STEP_SUMMARY"
+
+  tag:
+    if: >-
+      github.event.pull_request.merged == true
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && startsWith(github.event.pull_request.head.ref, 'auto-release/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub App token
+        id: app
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0
+          token: ${{ steps.app.outputs.token }}
+
+      - name: Tag the merge commit and create the GitHub Release
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          version=${HEAD_REF#auto-release/v}
+          manifest=$(.github/scripts/auto-release.sh version)
+          if [ "$manifest" != "$version" ]; then
+            echo "::error::$HEAD_REF merged, but the manifest says $manifest"
+            exit 1
+          fi
+          git tag "v$version" "$SHA"
+          git push origin "v$version"
+          [ "$CREATE_RELEASE" = true ] || exit 0
+          if [ -f CHANGELOG.md ]; then
+            awk -v v="$version" '$0 ~ "^## \\[" v "\\]" {f=1; next}
+              f && /^## \[/ {exit} f {print}' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          else
+            printf '%s\n' "$PR_BODY" > "$RUNNER_TEMP/notes.md"
+          fi
+          gh release create "v$version" --verify-tag --title "v$version" \
+            --notes-file "$RUNNER_TEMP/notes.md"
