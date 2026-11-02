@@ -92,6 +92,13 @@ Run `gh issue list` for the current state. There are currently no open issues.
   one process (as the tests build) every app served the last-built spec. `c8` is the
   Cucumber coverage tool; don't drop it to cut Dependabot noise (Node's
   built-in coverage only works with `node:test`).
+  `overrides.c8` in `package.json` pins `glob` ^14.0.3 and `minimatch` ^11.0.4
+  inside c8's tree only (added 2026-11-02): c8 12.0.0 → `test-exclude` 8.0.0
+  pulled vulnerable `glob` 13 / `minimatch` 10 (GHSA-3g3m-2fjr-6pw4,
+  GHSA-g3hv-75wg-m249), failing `npm audit` and Dependabot's security update
+  with no upstream fix. Verified the include/exclude globs and the 100% gate
+  still work under them. Remove the override once a c8/test-exclude release
+  depends on the fixed versions (`npm explain glob` shows it from c8 directly).
 - **Release:** bump the version and push a `v*` tag → the publish workflows build
   and push multi-platform images to GHCR + Docker Hub and sync the README to
   Docker Hub. See the README "Publish" section. In practice:
