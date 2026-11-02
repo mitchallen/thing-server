@@ -64,5 +64,11 @@
   },
   "allowScripts": {
     "@scarf/scarf": false
+  },
+  "overrides": {
+    "c8": {
+      "glob": "^14.0.3",
+      "minimatch": "^11.0.4"
+    }
   }
 }
