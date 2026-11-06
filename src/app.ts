@@ -40,6 +40,7 @@ export const createApp = () => {
 
     // swagger
     const EXPLORER_PATH = joinUrlPath(BASE_PATH, '/api-docs');
+    const OPENAPI_PATH = joinUrlPath(BASE_PATH, '/openapi.json');
     const API_TITLE = APP_NAME;
 
     const customSwaggerOptions = {
@@ -103,6 +104,22 @@ export const createApp = () => {
 
     app.use(cors());
 
+    // The spec as JSON, for tools that generate clients from it. Open like the
+    // explorer, which already publishes the same document. Its server URL is
+    // absolute because a generator has no page to resolve a relative one against,
+    // and UTCP's converter would otherwise write tools that can never be called.
+    app.get(OPENAPI_PATH, (req: Request, res: Response) => {
+        const proto = req.get('x-forwarded-proto')?.split(',')[0].trim() || req.protocol;
+        const host = req.get('x-forwarded-host') || req.get('host');
+        res.json({
+            ...swaggerDocs,
+            servers: [{
+                url: `${proto}://${host}${BASE_PATH.replace(/\/$/, '')}`,
+                description: 'This server, as seen by the request',
+            }],
+        });
+    });
+
     // Setup swagger explorer. serveFiles, not serve: `serve` reads the init
     // script from module-level state that the last setup() call overwrites,
     // so every app in the process would serve whichever spec was built last.
@@ -143,6 +160,7 @@ export const createApp = () => {
             uptime: uptime.toHHMMSS(),
             route: BASE_PATH,
             explorer: EXPLORER_PATH,
+            openapi: OPENAPI_PATH,
             meta: {
                 label: thingsLabel,
                 path: thingsPath,

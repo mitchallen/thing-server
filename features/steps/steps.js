@@ -129,6 +129,63 @@ When('I fetch the OpenAPI spec', async function () {
     this.spec = JSON.parse(match[1]);
 });
 
+async function fetchServedSpec(world, path) {
+    const res = await get(path);
+    assert.strictEqual(res.status, 200, `expected ${path} to be served`);
+    const server = await listen(getApp());
+    world.address = `http://127.0.0.1:${server.address().port}`;
+    world.spec = res.body;
+}
+
+When('I fetch the served OpenAPI spec', async function () {
+    await fetchServedSpec(this, '/openapi.json');
+});
+
+When('I fetch the served OpenAPI spec from {string}', async function (path) {
+    await fetchServedSpec(this, path);
+});
+
+Then("the served spec server URL should be this server's address", function () {
+    assert.strictEqual(this.spec.servers[0].url, this.address);
+});
+
+Then("the served spec server URL should be this server's address plus {string}", function (base) {
+    assert.strictEqual(this.spec.servers[0].url, `${this.address}${base}`);
+});
+
+const operationsOf = (spec) => Object.entries(spec.paths).flatMap(([path, item]) =>
+    Object.values(item).map((operation) => ({ path, operation })));
+
+Then('every operation should have a unique operationId', function () {
+    const ids = operationsOf(this.spec).map(({ operation }) => operation.operationId);
+    assert.ok(ids.every(Boolean), 'an operation has no operationId');
+    assert.strictEqual(new Set(ids).size, ids.length, 'operationIds are not unique');
+});
+
+Then('the operation at {string} should have the operationId {string}', function (path, id) {
+    assert.strictEqual(this.spec.paths[path].get.operationId, id);
+});
+
+Then('the operations under {string} should require the apiKey security scheme', function (prefix) {
+    assert.strictEqual(this.spec.components.securitySchemes.apiKey.name, 'x-api-key');
+    for (const { path, operation } of operationsOf(this.spec)) {
+        if (path.startsWith(prefix)) {
+            assert.deepStrictEqual(operation.security, [{ apiKey: [] }], path);
+        }
+    }
+});
+
+Then('the root operation should not require a security scheme', function () {
+    assert.strictEqual(this.spec.paths['/'].get.security, undefined);
+});
+
+Then('no operation should take the API key as a parameter', function () {
+    for (const { path, operation } of operationsOf(this.spec)) {
+        const names = (operation.parameters || []).map((parameter) => parameter.name);
+        assert.ok(!names.includes('x-api-key'), path);
+    }
+});
+
 Then('the spec should document the path {string}', function (path) {
     assert.ok(
         Object.prototype.hasOwnProperty.call(this.spec.paths, path),

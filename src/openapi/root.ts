@@ -6,6 +6,7 @@ const rootFragment: OpenApiFragmentFactory = ({ path, label, list }) => ({
     paths: {
         '/': {
             get: {
+                operationId: 'getStatus',
                 summary: 'Get the service status',
                 tags: ['service health'],
                 responses: {

@@ -62,6 +62,14 @@ http://localhost:1234/api-docs
 
 The root endpoint also advertises the explorer path in its `explorer` field.
 
+The same OpenAPI 3 spec is served as JSON, without an API key, for tools that generate clients or tool definitions from it:
+
+```
+http://localhost:1234/openapi.json
+```
+
+Every operation has an `operationId`, built from your data file's `label`, and the collection routes declare `x-api-key` as an `apiKey` security scheme. Its `servers` entry is the absolute address the request came in on, honoring `X-Forwarded-Proto` and `X-Forwarded-Host` behind a proxy. In the explorer, enter the key with **Authorize**.
+
 * * *
 
 ### Environment variables
