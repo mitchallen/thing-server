@@ -57,6 +57,12 @@ Run `gh issue list` for the current state. There are currently no open issues.
   minor/patch bumps are ignored — only its majors come through. The docker
   `node` image ignores odd (non-LTS) majors by explicit range; extend the
   list before Node 33.
+- **OpenAPI for tool generators:** the spec is also served as JSON at `/openapi.json`
+  with an absolute server URL. UTCP's converter silently skips an operation with no
+  `operationId` and turns a header parameter into a tool input, so give every
+  operation a unique `operationId` built from the label, and declare the key through
+  the `apiKey` security scheme, never as a parameter. `features/openapi.feature`
+  enforces both.
 - **OpenAPI:** the spec lives in `src/openapi/`. Each fragment is a **function
   of the live routes**, not a static object: `buildSpec(definition, routes)` in
   `index.ts` calls every entry in `fragments` with the served `{ path, label,

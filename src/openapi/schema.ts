@@ -16,6 +16,13 @@ export const schemaName = (label: string): string => {
     return singular.charAt(0).toUpperCase() + singular.slice(1);
 };
 
+// The label as one word for an operationId: 'things' -> 'Things', 'my-pets' -> 'MyPets'.
+export const operationName = (label: string): string => {
+    const words = label.split(/[^a-zA-Z0-9]+/).filter(Boolean);
+    const name = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join('');
+    return name || 'Items';
+};
+
 // Map a sample value to an OpenAPI type. `null` yields an empty schema, which
 // is OpenAPI's "any", since one null sample says nothing about the property.
 const typeOf = (value: unknown): { type?: string } => {
