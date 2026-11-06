@@ -7,13 +7,6 @@ import { RouteInfo } from './types';
 // A single trailing 's' is dropped so 'things' documents a 'Thing' — a display
 // nicety, not real singularisation ('species' would become 'Specie'). It only
 // ever affects the schema's name, never a route or a property.
-// The label as one word for an operationId: 'things' -> 'Things', 'my-pets' -> 'MyPets'.
-export const operationName = (label: string): string => {
-    const words = label.split(/[^a-zA-Z0-9]+/).filter(Boolean);
-    const name = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join('');
-    return name || 'Items';
-};
-
 export const schemaName = (label: string): string => {
     const cleaned = label.replace(/[^a-zA-Z0-9._-]/g, '');
     const singular = cleaned.endsWith('s') ? cleaned.slice(0, -1) : cleaned;
@@ -21,6 +14,13 @@ export const schemaName = (label: string): string => {
         return 'Item';
     }
     return singular.charAt(0).toUpperCase() + singular.slice(1);
+};
+
+// The label as one word for an operationId: 'things' -> 'Things', 'my-pets' -> 'MyPets'.
+export const operationName = (label: string): string => {
+    const words = label.split(/[^a-zA-Z0-9]+/).filter(Boolean);
+    const name = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join('');
+    return name || 'Items';
 };
 
 // Map a sample value to an OpenAPI type. `null` yields an empty schema, which

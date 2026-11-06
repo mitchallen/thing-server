@@ -145,6 +145,16 @@ When('I fetch the served OpenAPI spec from {string}', async function (path) {
     await fetchServedSpec(this, path);
 });
 
+When('I fetch the served OpenAPI spec with X-Forwarded-Proto {string} and X-Forwarded-Host {string}', async function (proto, host) {
+    const res = await get('/openapi.json', { 'x-forwarded-proto': proto, 'x-forwarded-host': host });
+    assert.strictEqual(res.status, 200);
+    this.spec = res.body;
+});
+
+Then('the served spec server URL should be {string}', function (url) {
+    assert.strictEqual(this.spec.servers[0].url, url);
+});
+
 Then("the served spec server URL should be this server's address", function () {
     assert.strictEqual(this.spec.servers[0].url, this.address);
 });

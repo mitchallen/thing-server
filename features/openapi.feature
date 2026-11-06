@@ -122,3 +122,12 @@ Feature: The OpenAPI spec describes the routes actually served
     Then the operations under "/v1" should require the apiKey security scheme
     And the root operation should not require a security scheme
     And no operation should take the API key as a parameter
+
+  Scenario: The served spec server URL honors forwarded headers behind a proxy
+    When I fetch the served OpenAPI spec with X-Forwarded-Proto "https, http" and X-Forwarded-Host "api.example.com"
+    Then the served spec server URL should be "https://api.example.com"
+
+  Scenario: A label with no letters or digits still gives a valid operationId
+    Given the things file is "./test/data/symbols/things.json"
+    When I fetch the served OpenAPI spec
+    Then the operation at "/v1/---" should have the operationId "listItems"
