@@ -15,7 +15,8 @@ coverage/
 
 # Environment / secrets
 .env
-.npmrc
+# .npmrc is committed: it holds only settings (release-age gate,
+# registry). Tokens go in ~/.npmrc or NODE_AUTH_TOKEN, never here.
 
 # OS / editor
 .DS_Store
